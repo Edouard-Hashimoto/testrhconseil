@@ -1,41 +1,42 @@
+// Test minimal - AUCUNE dépendance, pas de DB
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  
-  const diagnostic = {
-    dbUrl: process.env.TURSO_DATABASE_URL ? (process.env.TURSO_DATABASE_URL.substring(0, 15) + "...") : "MISSING",
+  const env = {
+    hasDbUrl: !!process.env.TURSO_DATABASE_URL,
+    dbUrlStart: (process.env.TURSO_DATABASE_URL || '').substring(0, 20),
     hasToken: !!process.env.TURSO_AUTH_TOKEN,
     nodeVersion: process.version,
-    error: null as any,
-    step: "start"
+    platform: process.platform,
   };
 
+  // Test fetch vers Turso
+  let fetchResult: any = null;
   try {
-    const db = useDb();
-    diagnostic.step = "connecting";
+    const url = (process.env.TURSO_DATABASE_URL || '').replace('libsql://', 'https://');
+    const token = process.env.TURSO_AUTH_TOKEN || '';
     
-    // Tentative simple de lecture
-    const result = await db.prepare('SELECT 1 as test').get();
-    diagnostic.step = "connected";
+    const res = await fetch(`${url}/v2/pipeline`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        requests: [
+          { type: 'execute', stmt: { sql: 'SELECT 1 as test', args: [] } },
+          { type: 'close' },
+        ],
+      }),
+    });
     
-    return {
-      status: "success",
-      message: "Connexion à la base de données réussie !",
-      diagnostic,
-      result
-    };
+    const data = await res.json();
+    fetchResult = { status: res.status, ok: res.ok, data };
   } catch (e: any) {
-    return {
-      status: "error",
-      message: "Échec du diagnostic de la base de données",
-      diagnostic: {
-        ...diagnostic,
-        error: {
-          name: e.name,
-          message: e.message,
-          stack: e.stack,
-          code: e.code
-        }
-      }
-    };
+    fetchResult = { error: e.message };
   }
+
+  return {
+    status: 'alive',
+    env,
+    fetchResult,
+  };
 });
