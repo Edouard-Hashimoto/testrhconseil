@@ -36,17 +36,16 @@ export const useDb = () => {
     };
 
     // Async initialization of tables if they don't exist
-    // Note: In production with Turso, you might want to use migration scripts instead.
     (async () => {
       try {
-        await _client.exec(`
-          CREATE TABLE IF NOT EXISTS news (
+        const statements = [
+          `CREATE TABLE IF NOT EXISTS news (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
             date DATETIME DEFAULT CURRENT_TIMESTAMP
-          );
-          CREATE TABLE IF NOT EXISTS services (
+          )`,
+          `CREATE TABLE IF NOT EXISTS services (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             color TEXT NOT NULL DEFAULT '#6b21a8',
@@ -54,12 +53,12 @@ export const useDb = () => {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             description TEXT,
             category_id INTEGER
-          );
-          CREATE TABLE IF NOT EXISTS settings (
+          )`,
+          `CREATE TABLE IF NOT EXISTS settings (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
-          );
-          CREATE TABLE IF NOT EXISTS particuliers (
+          )`,
+          `CREATE TABLE IF NOT EXISTS particuliers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titre TEXT NOT NULL,
             description_courte TEXT NOT NULL,
@@ -68,8 +67,8 @@ export const useDb = () => {
             image TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             color TEXT DEFAULT '#42B9B5'
-          );
-          CREATE TABLE IF NOT EXISTS equipe (
+          )`,
+          `CREATE TABLE IF NOT EXISTS equipe (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             slug TEXT NOT NULL,
             nom TEXT NOT NULL,
@@ -77,23 +76,25 @@ export const useDb = () => {
             description TEXT,
             image TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-          );
-          CREATE TABLE IF NOT EXISTS categories (
+          )`,
+          `CREATE TABLE IF NOT EXISTS categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titre TEXT NOT NULL,
             image TEXT,
             description TEXT,
             parent_id INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-          );
-          CREATE TABLE IF NOT EXISTS statistics (
+          )`,
+          `CREATE TABLE IF NOT EXISTS statistics (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             text TEXT NOT NULL,
             image TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-          );
-        `);
+          )`
+        ];
+        
+        await client.batch(statements, "write");
 
         // Insert default settings
         await _client.prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`).run('qualiopi_visible', '1');

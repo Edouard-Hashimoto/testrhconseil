@@ -11,17 +11,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    rollupConfig: {
-      external: ['@prisma/client', '.prisma/client']
-    }
-  },
-
-  vite: {
-    resolve: {
-      alias: {
-        '.prisma/client/index-browser': path.resolve('./node_modules/.prisma/client/index-browser.js')
-      }
-    }
+    preset: 'netlify'
   },
 
   devtools: { enabled: true },
