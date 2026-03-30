@@ -7,7 +7,6 @@ import 'node:buffer';
 import 'node:fs';
 import 'node:path';
 import 'node:crypto';
-import '@libsql/client';
 
 const particuliers_put = defineEventHandler(async (event) => {
   var _a, _b;

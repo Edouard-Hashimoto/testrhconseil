@@ -8,7 +8,6 @@ import 'node:buffer';
 import 'node:fs';
 import 'node:path';
 import 'node:crypto';
-import '@libsql/client';
 
 const statistics_delete = defineEventHandler(async (event) => {
   requireAuth(event);

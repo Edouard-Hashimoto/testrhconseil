@@ -7,7 +7,6 @@ import 'node:buffer';
 import 'node:fs';
 import 'node:path';
 import 'node:crypto';
-import '@libsql/client';
 
 const services_post = defineEventHandler(async (event) => {
   const body = await readBody(event);

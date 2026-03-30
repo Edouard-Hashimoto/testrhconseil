@@ -8,7 +8,6 @@ import 'node:https';
 import 'node:events';
 import 'node:buffer';
 import 'node:crypto';
-import '@libsql/client';
 
 const news_post = defineEventHandler(async (event) => {
   requireAuth(event);

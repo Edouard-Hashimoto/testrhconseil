@@ -9,7 +9,6 @@ import 'node:buffer';
 import 'node:fs';
 import 'node:path';
 import 'node:crypto';
-import '@libsql/client';
 
 const uploadQualiopi_post = defineEventHandler(async (event) => {
   const formData = await readFormData(event);

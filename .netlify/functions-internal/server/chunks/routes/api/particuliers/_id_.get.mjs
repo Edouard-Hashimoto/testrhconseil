@@ -7,7 +7,6 @@ import 'node:buffer';
 import 'node:fs';
 import 'node:path';
 import 'node:crypto';
-import '@libsql/client';
 
 const _id__get = defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
