@@ -1,4 +1,4 @@
-import { createClient } from '@libsql/client';
+import { createClient } from '@libsql/client/web';
 
 let _client: any = null;
 let _initPromise: Promise<any> | null = null;
