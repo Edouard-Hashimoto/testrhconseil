@@ -10,10 +10,6 @@ export default defineNuxtConfig({
     adminPassword: process.env.ADMIN_PASSWORD,
   },
 
-  nitro: {
-    preset: 'netlify'
-  },
-
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   app: {
