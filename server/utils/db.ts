@@ -3,6 +3,7 @@ import { createClient } from '@libsql/client';
 let _client: any = null;
 let _initPromise: Promise<any> | null = null;
 
+// Initialisation asynchrone des tables
 const initializeDatabase = async (client: any, wrapper: any) => {
   try {
     const statements = [
@@ -71,17 +72,20 @@ const initializeDatabase = async (client: any, wrapper: any) => {
     console.log('Database initialized successfully');
   } catch (e) {
     console.error('Database initialization error:', e);
-    throw e;
+    // On ne jette pas l'erreur ici pour laisser les futures requêtes tenter leur chance
   }
 };
 
 export const useDb = () => {
   if (!_client) {
+    // Utiliser fallback si variables manquantes
     const url = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL || 'file:data.db';
-    const authToken = process.env.TURSO_AUTH_TOKEN;
+    const authToken = process.env.TURSO_AUTH_TOKEN || '';
 
+    // Détection si on est sur Netlify (Linux) pour choisir le bon driver si nécessaire
+    // Mais ici createClient est universel
     const client = createClient({
-      url: url.startsWith('libsql://') ? url : `file:${url}`,
+      url: url,
       authToken: authToken,
     });
 
@@ -89,32 +93,34 @@ export const useDb = () => {
     _client = {
       client,
       async exec(sql: string) {
-        await _initPromise;
+        if (_initPromise) await _initPromise;
         return await client.execute(sql);
       },
       prepare(sql: string) {
         return {
           async all(...args: any[]) {
-            await _initPromise;
-            const res = await client.execute({ sql, args: args.length > 0 && Array.isArray(args[0]) ? args[0] : args });
+            if (_initPromise) await _initPromise;
+            const params = args.length > 0 && Array.isArray(args[0]) ? args[0] : args;
+            const res = await client.execute({ sql, args: params });
             return res.rows;
           },
           async get(...args: any[]) {
-            await _initPromise;
-            const res = await client.execute({ sql, args: args.length > 0 && Array.isArray(args[0]) ? args[0] : args });
+            if (_initPromise) await _initPromise;
+            const params = args.length > 0 && Array.isArray(args[0]) ? args[0] : args;
+            const res = await client.execute({ sql, args: params });
             return res.rows[0];
           },
           async run(...args: any[]) {
-            await _initPromise;
-            return await client.execute({ sql, args: args.length > 0 && Array.isArray(args[0]) ? args[0] : args });
+            if (_initPromise) await _initPromise;
+            const params = args.length > 0 && Array.isArray(args[0]) ? args[0] : args;
+            return await client.execute({ sql, args: params });
           }
         };
       }
     };
 
-    // Start initialization and store the promise
+    // Lancer l'initialisation et stocker la Promise
     _initPromise = initializeDatabase(client, _client);
   }
   return _client;
 };
-
