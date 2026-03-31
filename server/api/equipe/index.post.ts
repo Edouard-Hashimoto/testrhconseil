@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb();
   const stmt = db.prepare('INSERT INTO equipe (slug, nom, role, image, description) VALUES (?, ?, ?, ?, ?)');
-  const result = await stmt.run(slug, nom, role, image || null, description);
+  const result = stmt.run(slug, nom, role, image || null, description);
 
   return { id: result.lastInsertRowid };
 });

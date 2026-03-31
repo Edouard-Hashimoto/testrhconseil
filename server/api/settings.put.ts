@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const upsert = db.prepare(`INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`)
 
   for (const [key, value] of Object.entries(body)) {
-    await upsert.run(key, value)
+    upsert.run(key, value)
   }
 
   return { success: true }

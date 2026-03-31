@@ -1,3 +1,0 @@
-﻿diff --git a/README.md b/README.md
-index 5886d55..25b5821 100644
-Binary files a/README.md and b/README.md differ

@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb();
   const stmt = db.prepare('UPDATE categories SET titre = ?, image = ?, description = ?, parent_id = ? WHERE id = ?');
-  await stmt.run(body.titre, body.image || null, body.description || null, body.parent_id || null, body.id);
+  stmt.run(body.titre, body.image || null, body.description || null, body.parent_id || null, body.id);
 
   return { success: true };
 });

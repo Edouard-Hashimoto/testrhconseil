@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
 
   try {
-    const existingTables = await db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t: any) => t.name);
+    const existingTables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t: any) => t.name);
     
     if (!existingTables.includes(table)) {
       throw createError({
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const data = await db.prepare(`SELECT * FROM "${table}"`).all();
+    const data = db.prepare(`SELECT * FROM "${table}"`).all();
     return data;
   } catch (error: any) {
     throw createError({

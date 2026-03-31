@@ -47,9 +47,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (imageFilename) {
-    await db.prepare('UPDATE statistics SET title = ?, text = ?, image = ? WHERE id = ?').run(title, text, imageFilename, id);
+    db.prepare('UPDATE statistics SET title = ?, text = ?, image = ? WHERE id = ?').run(title, text, imageFilename, id);
   } else {
-    await db.prepare('UPDATE statistics SET title = ?, text = ? WHERE id = ?').run(title, text, id);
+    db.prepare('UPDATE statistics SET title = ?, text = ? WHERE id = ?').run(title, text, id);
   }
 
   return { success: true };

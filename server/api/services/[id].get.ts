@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
   const db = useDb();
-  const service = await db.prepare(`
+  const service = db.prepare(`
     SELECT services.*, 
            categories.titre as category_titre, 
            categories.image as category_image, 

@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
   const date = new Date().toISOString().split('T')[0];
   
   const insert = db.prepare('INSERT INTO news (title, content, date, image) VALUES (?, ?, ?, ?)');
-  const result = await insert.run(title, content, date, imageFilename);
+  const result = insert.run(title, content, date, imageFilename);
   
   return {
     id: result.lastInsertRowid,

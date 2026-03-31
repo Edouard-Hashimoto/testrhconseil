@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   
   if (query.full) {
     // Version avec info parent pour l'admin
-    const categories = await db.prepare(`
+    const categories = db.prepare(`
       SELECT c1.*, c2.titre as parent_titre 
       FROM categories c1
       LEFT JOIN categories c2 ON c1.parent_id = c2.id
@@ -13,6 +13,6 @@ export default defineEventHandler(async (event) => {
     return categories;
   }
   
-  const categories = await db.prepare('SELECT * FROM categories ORDER BY created_at DESC').all();
+  const categories = db.prepare('SELECT * FROM categories ORDER BY created_at DESC').all();
   return categories;
 });

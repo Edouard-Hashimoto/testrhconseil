@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const id = query.id;
 
   if (id) {
-    const stat = await db.prepare('SELECT * FROM statistics WHERE id = ?').get(id);
+    const stat = db.prepare('SELECT * FROM statistics WHERE id = ?').get(id);
     if (!stat) {
       throw createError({
         statusCode: 404,
@@ -15,6 +15,6 @@ export default defineEventHandler(async (event) => {
     return stat;
   }
 
-  const statistics = await db.prepare('SELECT * FROM statistics ORDER BY created_at DESC').all();
+  const statistics = db.prepare('SELECT * FROM statistics ORDER BY created_at DESC').all();
   return statistics;
 });

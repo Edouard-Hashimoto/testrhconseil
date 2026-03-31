@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const insert = db.prepare('INSERT INTO statistics (title, text, image) VALUES (?, ?, ?)');
-  const result = await insert.run(title, text, imageFilename);
+  const result = insert.run(title, text, imageFilename);
 
   return {
     id: result.lastInsertRowid,

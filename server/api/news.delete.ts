@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Trouver l'image pour la supprimer du disque
-  const article = await db.prepare('SELECT image FROM news WHERE id = ?').get(id) as { image: string | null };
+  const article = db.prepare('SELECT image FROM news WHERE id = ?').get(id) as { image: string | null };
   if (article && article.image) {
     const filePath = join(process.cwd(), 'public/uploads/news', article.image);
     if (existsSync(filePath)) {
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   }
   
   const deleteStmt = db.prepare('DELETE FROM news WHERE id = ?');
-  await deleteStmt.run(id);
+  deleteStmt.run(id);
   
   return {
     success: true

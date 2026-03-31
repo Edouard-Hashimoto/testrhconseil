@@ -4,7 +4,7 @@ import { join } from 'path';
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   const formData = await readFormData(event);
-  const file = await formData.get('file') as File | null;
+  const file = formData.get('file') as File | null;
 
   if (!file) {
     throw createError({ statusCode: 400, statusMessage: 'Aucun fichier fourni' });

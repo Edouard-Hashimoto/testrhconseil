@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb();
   const stmt = db.prepare('INSERT INTO categories (titre, image, description, parent_id) VALUES (?, ?, ?, ?)');
-  const result = await stmt.run(body.titre, body.image || null, body.description || null, body.parent_id || null);
+  const result = stmt.run(body.titre, body.image || null, body.description || null, body.parent_id || null);
 
   return { id: result.lastInsertRowid, ...body };
 });
