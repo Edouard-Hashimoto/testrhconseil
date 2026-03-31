@@ -28,7 +28,7 @@ useHead({
       <div class="service-card-hero" :style="{ background: service.color }">
         <div class="hero-content">
           <h1 class="service-title">{{ service.title }}</h1>
-          <img v-if="service.logo" :src="`/logos/${service.logo}`" class="service-logo" alt="" />
+          <img v-if="service.logo" :src="service.logo.startsWith('http') ? service.logo : `/logos/${service.logo}`" class="service-logo" alt="" />
         </div>
       </div>
 
