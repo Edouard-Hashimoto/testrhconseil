@@ -14,5 +14,5 @@ export default defineEventHandler(async (event) => {
     args: [body.title, body.color || '#6b21a8', body.logo || null, body.description || null, body.category_id || null] 
   });
 
-  return { id: res.lastInsertRowid, ...body };
+  return { id: res.lastInsertRowid?.toString(), ...body };
 });

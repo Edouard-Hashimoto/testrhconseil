@@ -10,5 +10,5 @@ export default defineEventHandler(async (event) => {
     args: [body.titre, body.description_courte || '', body.description_complete || '', body.picto || null, body.image || null, body.color || '#42B9B5'] 
   });
 
-  return { id: res.lastInsertRowid, ...body };
+  return { id: res.lastInsertRowid?.toString(), ...body };
 });

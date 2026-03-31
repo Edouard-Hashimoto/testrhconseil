@@ -10,5 +10,5 @@ export default defineEventHandler(async (event) => {
     args: [body.titre, body.image || null, body.description || null, body.parent_id || null] 
   });
 
-  return { id: res.lastInsertRowid, ...body };
+  return { id: res.lastInsertRowid?.toString(), ...body };
 });

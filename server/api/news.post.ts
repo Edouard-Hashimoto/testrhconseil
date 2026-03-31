@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   });
 
   return {
-    id: res.lastInsertRowid,
+    id: res.lastInsertRowid?.toString(),
     success: true,
   };
 });

@@ -13,5 +13,5 @@ export default defineEventHandler(async (event) => {
     args: [slug, nom, role, image || null, description] 
   });
 
-  return { id: res.lastInsertRowid };
+  return { id: res.lastInsertRowid?.toString() };
 });
