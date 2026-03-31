@@ -1,13 +1,12 @@
 import { useDb } from '../../utils/db';
 import { requireAuth } from '../../utils/auth';
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   requireAuth(event);
   const id = getRouterParam(event, 'id');
 
   const db = useDb();
-  const stmt = db.prepare('DELETE FROM equipe WHERE id = ?');
-  stmt.run(id);
+  await db.execute({ sql: 'DELETE FROM equipe WHERE id = ?', args: [id as string] });
 
   return { success: true };
 });

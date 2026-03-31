@@ -5,8 +5,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb();
-  db.prepare('UPDATE services SET title = ?, color = ?, logo = ?, description = ?, category_id = ? WHERE id = ?')
-    .run(body.title, body.color, body.logo ?? null, body.description ?? null, body.category_id ?? null, body.id);
+  await db.execute({ 
+    sql: 'UPDATE services SET title = ?, color = ?, logo = ?, description = ?, category_id = ? WHERE id = ?', 
+    args: [body.title, body.color, body.logo ?? null, body.description ?? null, body.category_id ?? null, body.id] 
+  });
 
   return { success: true };
 });

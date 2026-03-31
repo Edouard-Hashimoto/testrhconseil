@@ -1,9 +1,10 @@
 import { useDb } from '../../utils/db';
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
   const db = useDb();
-  const user = db.prepare('SELECT * FROM equipe WHERE id = ?').get(id);
+  const res = await db.execute({ sql: 'SELECT * FROM equipe WHERE id = ?', args: [id as string] });
+  const user = res.rows[0];
   
   if (!user) {
     throw createError({ statusCode: 404, statusMessage: 'Membre non trouvé' });

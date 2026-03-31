@@ -9,8 +9,10 @@ export default defineEventHandler(async (event) => {
   const slug = nom.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
   const db = useDb();
-  const stmt = db.prepare('UPDATE equipe SET slug = ?, nom = ?, role = ?, image = ?, description = ? WHERE id = ?');
-  stmt.run(slug, nom, role, image || null, description, id);
+  await db.execute({ 
+    sql: 'UPDATE equipe SET slug = ?, nom = ?, role = ?, image = ?, description = ? WHERE id = ?', 
+    args: [slug, nom, role, image || null, description, id as string] 
+  });
 
   return { success: true };
 });

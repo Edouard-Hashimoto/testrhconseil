@@ -236,7 +236,7 @@ const deleteService = async (id) => {
                   </td>
                   <td>
                     <div class="logo-edit">
-                      <img v-if="editData.logo" :src="`/logos/${editData.logo}`" class="logo-thumb" />
+                      <img v-if="editData.logo" :src="useAssetUrl(editData.logo, 'logo')" class="logo-thumb" />
                       <input type="file" accept="image/*" class="file-input-sm" />
                     </div>
                   </td>
@@ -260,7 +260,7 @@ const deleteService = async (id) => {
                     <div class="service-desc-preview">{{ service.description?.substring(0, 60) }}{{ (service.description?.length > 60) ? '...' : '' }}</div>
                   </td>
                   <td>
-                    <img v-if="service.logo" :src="`/logos/${service.logo}`" class="logo-thumb" />
+                    <img v-if="service.logo" :src="useAssetUrl(service.logo, 'logo')" class="logo-thumb" />
                     <span v-else class="no-logo">Aucun</span>
                   </td>
                   <td class="text-right">
@@ -290,7 +290,7 @@ const deleteService = async (id) => {
             <span class="preview-title">{{ service.title }}</span>
             <img
               v-if="service.logo"
-              :src="`/logos/${service.logo}`"
+              :src="useAssetUrl(service.logo, 'logo')"
               class="preview-logo"
             />
           </div>

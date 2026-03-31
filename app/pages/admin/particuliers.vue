@@ -242,12 +242,12 @@ const deleteParticulier = async (id) => {
                   <td>
                     <div class="logo-edit mb-2">
                       <span class="text-xs">Picto:</span>
-                      <img v-if="editData.picto" :src="`/uploads/${editData.picto}`" class="logo-thumb" />
+                      <img v-if="editData.picto" :src="useAssetUrl(editData.picto, 'particulier')" class="logo-thumb" />
                       <input type="file" name="pictoEdit" accept="image/*" class="file-input-sm" />
                     </div>
                     <div class="logo-edit">
                       <span class="text-xs">Image:</span>
-                      <img v-if="editData.image" :src="`/uploads/${editData.image}`" class="logo-thumb" />
+                      <img v-if="editData.image" :src="useAssetUrl(editData.image, 'particulier')" class="logo-thumb" />
                       <input type="file" name="imageEdit" accept="image/*" class="file-input-sm" />
                     </div>
                   </td>
@@ -270,12 +270,12 @@ const deleteParticulier = async (id) => {
                   <td>
                     <div class="flex items-center gap-2 mb-1">
                       <span class="text-xs text-gray-400">Picto:</span>
-                      <img v-if="part.picto" :src="`/uploads/${part.picto}`" class="logo-thumb" />
+                      <img v-if="part.picto" :src="useAssetUrl(part.picto, 'particulier')" class="logo-thumb" />
                       <span v-else class="no-logo">Aucun</span>
                     </div>
                     <div class="flex items-center gap-2">
                       <span class="text-xs text-gray-400">Image:</span>
-                      <img v-if="part.image" :src="`/uploads/${part.image}`" class="logo-thumb" />
+                      <img v-if="part.image" :src="useAssetUrl(part.image, 'particulier')" class="logo-thumb" />
                       <span v-else class="no-logo">Aucune</span>
                     </div>
                   </td>

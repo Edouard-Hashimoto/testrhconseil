@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="articles-page">
     <div class="container py-12">
       <header class="articles-header">
@@ -13,7 +13,7 @@
           
           <div class="image-wrapper">
             <template v-if="item.image">
-              <img :src="`/uploads/news/${item.image}`" :alt="item.title" class="article-image" />
+              <img :src="useAssetUrl(item.image, 'news')" :alt="item.title" class="article-image" />
             </template>
             <div v-else class="image-placeholder">
               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">

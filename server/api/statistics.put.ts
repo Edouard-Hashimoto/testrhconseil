@@ -1,6 +1,3 @@
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
-
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   const db = useDb();
@@ -19,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
   let title = '';
   let text = '';
-  let imageFilename: string | undefined = undefined;
+  let imageUrl: string | undefined = undefined;
 
   for (const item of formData) {
     if (item.name === 'title' && item.data) {
@@ -27,15 +24,8 @@ export default defineEventHandler(async (event) => {
     } else if (item.name === 'text' && item.data) {
       text = item.data.toString();
     } else if (item.name === 'image' && item.filename && item.data.length > 0) {
-      const ext = item.filename.split('.').pop();
-      imageFilename = `stat-${Date.now()}.${ext}`;
-      const uploadDir = join(process.cwd(), 'public/uploads/stats');
-      
-      if (!existsSync(uploadDir)) {
-        mkdirSync(uploadDir, { recursive: true });
-      }
-      
-      writeFileSync(join(uploadDir, imageFilename), item.data);
+      const { url } = await uploadToCloudinary(item.data, 'stats');
+      imageUrl = url;
     }
   }
 
@@ -46,10 +36,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (imageFilename) {
-    db.prepare('UPDATE statistics SET title = ?, text = ?, image = ? WHERE id = ?').run(title, text, imageFilename, id);
+  if (imageUrl) {
+    await db.execute({ 
+      sql: 'UPDATE statistics SET title = ?, text = ?, image = ? WHERE id = ?', 
+      args: [title, text, imageUrl, id as string] 
+    });
   } else {
-    db.prepare('UPDATE statistics SET title = ?, text = ? WHERE id = ?').run(title, text, id);
+    await db.execute({ 
+      sql: 'UPDATE statistics SET title = ?, text = ? WHERE id = ?', 
+      args: [title, text, id as string] 
+    });
   }
 
   return { success: true };

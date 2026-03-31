@@ -22,7 +22,7 @@ useHead({
 
       <div class="member-layout">
         <div class="image-wrapper">
-          <img v-if="membre.image" :src="`/equipe-images/${membre.image}`" :alt="membre.nom" class="member-photo" />
+          <img v-if="membre.image" :src="useAssetUrl(membre.image, 'equipe')" :alt="membre.nom" class="member-photo" />
           <div v-else class="member-photo placeholder"></div>
         </div>
         <div class="info-wrapper">

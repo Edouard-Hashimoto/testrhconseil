@@ -211,7 +211,7 @@ const deleteCategory = async (id) => {
                 <template v-if="editingId === category.id">
                    <td>
                     <div class="logo-edit">
-                      <img v-if="editData.image" :src="`/categories/${editData.image}`" class="logo-thumb" />
+                      <img v-if="editData.image" :src="useAssetUrl(editData.image, 'category')" class="logo-thumb" />
                       <input type="file" accept="image/*" class="file-input-sm" />
                     </div>
                   </td>
@@ -234,7 +234,7 @@ const deleteCategory = async (id) => {
                 </template>
                 <template v-else>
                    <td>
-                    <img v-if="category.image" :src="`/categories/${category.image}`" class="logo-thumb" />
+                    <img v-if="category.image" :src="useAssetUrl(category.image, 'category')" class="logo-thumb" />
                     <span v-else class="no-logo">Aucune</span>
                   </td>
                   <td>

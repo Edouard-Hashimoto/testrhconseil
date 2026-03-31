@@ -3,16 +3,15 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   
   if (query.full) {
-    // Version avec info parent pour l'admin
-    const categories = db.prepare(`
+    const res = await db.execute(`
       SELECT c1.*, c2.titre as parent_titre 
       FROM categories c1
       LEFT JOIN categories c2 ON c1.parent_id = c2.id
       ORDER BY c1.created_at DESC
-    `).all();
-    return categories;
+    `);
+    return res.rows;
   }
   
-  const categories = db.prepare('SELECT * FROM categories ORDER BY created_at DESC').all();
-  return categories;
+  const res = await db.execute('SELECT * FROM categories ORDER BY created_at DESC');
+  return res.rows;
 });

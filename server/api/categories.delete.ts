@@ -7,10 +7,9 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   
   // Set category_id to NULL for services linked to this category
-  db.prepare('UPDATE services SET category_id = NULL WHERE category_id = ?').run(body.id);
+  await db.execute({ sql: 'UPDATE services SET category_id = NULL WHERE category_id = ?', args: [body.id] });
   
-  const stmt = db.prepare('DELETE FROM categories WHERE id = ?');
-  stmt.run(body.id);
+  await db.execute({ sql: 'DELETE FROM categories WHERE id = ?', args: [body.id] });
 
   return { success: true };
 });

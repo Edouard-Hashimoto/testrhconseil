@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'ID manquant' });
   }
 
-  db.prepare('DELETE FROM statistics WHERE id = ?').run(id);
+  await db.execute({ sql: 'DELETE FROM statistics WHERE id = ?', args: [id as string] });
 
   return { success: true };
 });

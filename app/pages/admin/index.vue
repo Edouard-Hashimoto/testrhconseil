@@ -249,7 +249,7 @@ const saveSettings = async () => {
           <div v-if="qualiopiVisible" class="field span-full" style="margin-top: 1rem;">
             <label>Logo Qualiopi</label>
             <div class="logo-upload-row">
-              <img v-if="qualiopiLogoUrl" :src="qualiopiLogoUrl" alt="Logo Qualiopi actuel" class="logo-preview" />
+              <img v-if="qualiopiLogoUrl" :src="useAssetUrl(qualiopiLogoUrl, 'qualiopi')" alt="Logo Qualiopi actuel" class="logo-preview" />
               <div class="logo-upload-controls">
                 <input ref="qualiopiLogoInput" type="file" accept="image/*" @change="handleLogoChange" />
                 <button type="button" @click="uploadQualiopiLogo" :disabled="!qualiopiLogoFile || isUploadingLogo" class="btn-primary">

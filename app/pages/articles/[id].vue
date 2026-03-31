@@ -24,7 +24,7 @@ useHead({
       </header>
 
       <div v-if="article.image" class="article-img-wrap">
-        <img :src="`/uploads/news/${article.image}`" :alt="article.title" class="article-img" />
+        <img :src="useAssetUrl(article.image, 'news')" :alt="article.title" class="article-img" />
       </div>
 
       <div class="article-body" v-html="article.content"></div>

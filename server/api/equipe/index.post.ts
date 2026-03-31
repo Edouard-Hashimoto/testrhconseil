@@ -8,8 +8,10 @@ export default defineEventHandler(async (event) => {
   const slug = nom.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
   const db = useDb();
-  const stmt = db.prepare('INSERT INTO equipe (slug, nom, role, image, description) VALUES (?, ?, ?, ?, ?)');
-  const result = stmt.run(slug, nom, role, image || null, description);
+  const res = await db.execute({ 
+    sql: 'INSERT INTO equipe (slug, nom, role, image, description) VALUES (?, ?, ?, ?, ?)', 
+    args: [slug, nom, role, image || null, description] 
+  });
 
-  return { id: result.lastInsertRowid };
+  return { id: res.lastInsertRowid };
 });

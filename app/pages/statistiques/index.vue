@@ -26,7 +26,7 @@ useHead({
         <div v-else class="stats-grid">
           <div v-for="stat in statistics" :key="stat.id" class="stat-card">
             <div class="stat-img-wrap" v-if="stat.image">
-              <img :src="`/uploads/stats/${stat.image}`" :alt="stat.title" class="stat-img" />
+              <img :src="useAssetUrl(stat.image, 'stats')" :alt="stat.title" class="stat-img" />
             </div>
             <div class="stat-content">
               <h2 class="stat-title">{{ stat.title }}</h2>

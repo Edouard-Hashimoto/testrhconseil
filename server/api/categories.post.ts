@@ -5,8 +5,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb();
-  const stmt = db.prepare('INSERT INTO categories (titre, image, description, parent_id) VALUES (?, ?, ?, ?)');
-  const result = stmt.run(body.titre, body.image || null, body.description || null, body.parent_id || null);
+  const res = await db.execute({ 
+    sql: 'INSERT INTO categories (titre, image, description, parent_id) VALUES (?, ?, ?, ?)', 
+    args: [body.titre, body.image || null, body.description || null, body.parent_id || null] 
+  });
 
-  return { id: result.lastInsertRowid, ...body };
+  return { id: res.lastInsertRowid, ...body };
 });

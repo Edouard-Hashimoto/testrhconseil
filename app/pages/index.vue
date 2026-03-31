@@ -56,7 +56,7 @@ onMounted(() => {
 
         <div class="left-col">
           <NuxtLink to="/statistiques" class="stat-card stat-link">
-            <img v-if="mainStat?.image" :src="`/uploads/stats/${mainStat.image}`" class="stat-card-bg" alt="Stats background" />
+            <img v-if="mainStat?.image" :src="useAssetUrl(mainStat.image, 'statistics')" class="stat-card-bg" alt="Stats background" />
             <div class="stat-card-body">
               <span class="stat-card-label">Statistiques</span>
               <h2 class="stat-card-title">{{ mainStat?.title || 'Statistiques 2024-2025' }}</h2>
@@ -64,7 +64,7 @@ onMounted(() => {
             </div>
           </NuxtLink>
           <NuxtLink to="/articles" class="stat-card actu stat-link">
-            <img v-if="latestNews?.image" :src="`/uploads/news/${latestNews.image}`" class="stat-card-bg stat-bg-actu" alt="Actualités" />
+            <img v-if="latestNews?.image" :src="useAssetUrl(latestNews.image, 'news')" class="stat-card-bg stat-bg-actu" alt="Actualités" />
             <div class="stat-card-body">
               <span class="stat-card-label">Agenda</span>
               <h2 class="stat-card-title">{{ latestNews?.title || 'Actualités du moment !' }}</h2>
@@ -95,7 +95,7 @@ onMounted(() => {
                 <span class="service-title">{{ item.title }}</span>
                 <img
                   v-if="item.logo"
-                  :src="`/logos/${item.logo}`"
+                  :src="useAssetUrl(item.logo, 'logo')"
                   :alt="item.title"
                   class="service-logo"
                 />

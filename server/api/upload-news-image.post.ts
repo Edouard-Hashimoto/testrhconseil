@@ -1,6 +1,3 @@
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   const formData = await readFormData(event);
@@ -14,13 +11,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Seules les images sont acceptées' });
   }
 
-  const dir = join(process.cwd(), 'public', 'news-images');
-  await mkdir(dir, { recursive: true });
+  const { url } = await uploadToCloudinary(await file.arrayBuffer(), 'news');
 
-  const ext = file.name.split('.').pop();
-  const filename = `article_${Date.now()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(join(dir, filename), buffer);
-
-  return { filename, url: `/news-images/${filename}` };
+  return { filename: url, url };
 });

@@ -1,5 +1,5 @@
 export default defineEventHandler(async () => {
   const db = useDb();
-  const particuliers = db.prepare('SELECT * FROM particuliers ORDER BY created_at ASC').all();
-  return particuliers;
+  const res = await db.execute('SELECT * FROM particuliers ORDER BY created_at ASC');
+  return res.rows;
 });

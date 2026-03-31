@@ -42,7 +42,7 @@ useHead({
           
           <NuxtLink v-for="membre in equipe" :key="membre.id" :to="`/presentation/${membre.id}`" class="member-card">
             <div class="member-photo-wrap">
-              <img v-if="membre.image" :src="`/equipe-images/${membre.image}`" :alt="membre.nom" class="member-photo" />
+              <img v-if="membre.image" :src="useAssetUrl(membre.image, 'equipe')" :alt="membre.nom" class="member-photo" />
               <div v-else class="member-photo bg-gray-200"></div>
             </div>
             <div class="member-info">

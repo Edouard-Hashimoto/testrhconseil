@@ -2,8 +2,8 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   
   try {
-    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all();
-    return tables;
+    const res = await db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
+    return res.rows;
   } catch (error: any) {
     throw createError({
       statusCode: 500,

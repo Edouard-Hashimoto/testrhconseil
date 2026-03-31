@@ -1,6 +1,3 @@
-import { unlinkSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
-
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   const body = await readBody(event);
@@ -15,21 +12,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Trouver l'image pour la supprimer du disque
-  const article = db.prepare('SELECT image FROM news WHERE id = ?').get(id) as { image: string | null };
-  if (article && article.image) {
-    const filePath = join(process.cwd(), 'public/uploads/news', article.image);
-    if (existsSync(filePath)) {
-      try {
-        unlinkSync(filePath);
-      } catch (e) {
-        console.error("Erreur lors de la suppression du fichier:", e);
-      }
-    }
-  }
-  
-  const deleteStmt = db.prepare('DELETE FROM news WHERE id = ?');
-  deleteStmt.run(id);
+  await db.execute({ sql: 'DELETE FROM news WHERE id = ?', args: [id] });
   
   return {
     success: true

@@ -1,6 +1,3 @@
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
-
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   const db = useDb();
@@ -12,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   let title = '';
   let text = '';
-  let imageFilename: string | null = null;
+  let imageUrl: string | null = null;
 
   for (const item of formData) {
     if (item.name === 'title' && item.data) {
@@ -20,15 +17,8 @@ export default defineEventHandler(async (event) => {
     } else if (item.name === 'text' && item.data) {
       text = item.data.toString();
     } else if (item.name === 'image' && item.filename && item.data.length > 0) {
-      const ext = item.filename.split('.').pop();
-      imageFilename = `stat-${Date.now()}.${ext}`;
-      const uploadDir = join(process.cwd(), 'public/uploads/stats');
-      
-      if (!existsSync(uploadDir)) {
-        mkdirSync(uploadDir, { recursive: true });
-      }
-      
-      writeFileSync(join(uploadDir, imageFilename), item.data);
+      const { url } = await uploadToCloudinary(item.data, 'stats');
+      imageUrl = url;
     }
   }
 
@@ -39,11 +29,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const insert = db.prepare('INSERT INTO statistics (title, text, image) VALUES (?, ?, ?)');
-  const result = insert.run(title, text, imageFilename);
+  const res = await db.execute({ 
+    sql: 'INSERT INTO statistics (title, text, image) VALUES (?, ?, ?)', 
+    args: [title, text, imageUrl] 
+  });
 
   return {
-    id: result.lastInsertRowid,
+    id: res.lastInsertRowid,
     success: true
   };
 });

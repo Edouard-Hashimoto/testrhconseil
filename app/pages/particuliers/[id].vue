@@ -37,7 +37,7 @@ useHead({
           <h2 class="section-title">Présentation du service</h2>
           
           <div v-if="particulier.image" class="content-image-wrapper">
-            <img :src="`/uploads/${particulier.image}`" class="content-image" alt="Image de présentation" />
+            <img :src="useAssetUrl(particulier.image, 'particulier')" class="content-image" alt="Image de présentation" />
           </div>
 
           <div class="description-text" v-if="particulier.description_complete">

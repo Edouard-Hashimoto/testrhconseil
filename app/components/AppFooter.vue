@@ -49,7 +49,7 @@ const onQualiopiError = (e) => {
       <div v-if="settings?.qualiopi_visible === '1'" class="footer-col footer-qualiopi-col">
         <NuxtLink to="/qualiopi" class="qualiopi-link">
           <img
-            :src="settings?.qualiopi_logo || '/assets/img/qualiopi.webp'"
+            :src="useAssetUrl(settings?.qualiopi_logo, 'qualiopi') || '/assets/img/qualiopi.webp'"
             alt="Qualiopi – Processus certifié"
             class="qualiopi-logo"
             @error="onQualiopiError"

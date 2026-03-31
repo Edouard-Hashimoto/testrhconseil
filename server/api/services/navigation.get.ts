@@ -2,20 +2,20 @@ export default defineEventHandler(async () => {
   const db = useDb();
   
   // Fetch all categories
-  const categories = db.prepare('SELECT * FROM categories ORDER BY titre ASC').all();
+  const resCats = await db.execute('SELECT * FROM categories ORDER BY titre ASC');
+  const categories = resCats.rows;
   
-  // For each category, fetch its services
-  const categoriesWithServices = categories.map(cat => {
-    const services = db.prepare('SELECT id, title FROM services WHERE category_id = ? ORDER BY created_at ASC').all(cat.id);
-    return {
-      ...cat,
-      services
-    };
-  });
+  // Fetch all services
+  const resServs = await db.execute('SELECT id, title, category_id FROM services ORDER BY created_at ASC');
+  const services = resServs.rows;
   
-  // Also fetch services without category
-  const uncategorizedServices = db.prepare('SELECT id, title FROM services WHERE category_id IS NULL ORDER BY created_at ASC').all();
+  const categoriesWithServices = categories.map(cat => ({
+    ...cat,
+    services: services.filter(s => s.category_id === cat.id)
+  }));
   
+  const uncategorizedServices = services.filter(s => s.category_id === null);
+
   return {
     categories: categoriesWithServices,
     uncategorized: uncategorizedServices

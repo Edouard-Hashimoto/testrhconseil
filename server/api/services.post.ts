@@ -5,8 +5,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb();
-  const stmt = db.prepare('INSERT INTO services (title, color, logo, description, category_id) VALUES (?, ?, ?, ?, ?)');
-  const result = stmt.run(body.title, body.color || '#6b21a8', body.logo || null, body.description || null, body.category_id || null);
+  const res = await db.execute({ 
+    sql: 'INSERT INTO services (title, color, logo, description, category_id) VALUES (?, ?, ?, ?, ?)', 
+    args: [body.title, body.color || '#6b21a8', body.logo || null, body.description || null, body.category_id || null] 
+  });
 
-  return { id: result.lastInsertRowid, ...body };
+  return { id: res.lastInsertRowid, ...body };
 });

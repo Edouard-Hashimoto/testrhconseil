@@ -1,6 +1,3 @@
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
-
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   
@@ -11,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   let title = '';
   let content = '';
-  let imageFilename: string | null = null;
+  let imageUrl: string | null = null;
 
   for (const item of formData) {
     if (item.name === 'title' && item.data) {
@@ -19,16 +16,8 @@ export default defineEventHandler(async (event) => {
     } else if (item.name === 'content' && item.data) {
       content = item.data.toString();
     } else if (item.name === 'image' && item.filename && item.data.length > 0) {
-      const ext = item.filename.split('.').pop();
-      const filename = `news-${Date.now()}.${ext}`;
-      const uploadDir = join(process.cwd(), 'public/uploads/news');
-      
-      if (!existsSync(uploadDir)) {
-        mkdirSync(uploadDir, { recursive: true });
-      }
-      
-      writeFileSync(join(uploadDir, filename), item.data);
-      imageFilename = filename;
+      const { url } = await uploadToCloudinary(item.data, 'news');
+      imageUrl = url;
     }
   }
   
@@ -42,11 +31,13 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   const date = new Date().toISOString().split('T')[0];
   
-  const insert = db.prepare('INSERT INTO news (title, content, date, image) VALUES (?, ?, ?, ?)');
-  const result = insert.run(title, content, date, imageFilename);
+  const res = await db.execute({ 
+    sql: 'INSERT INTO news (title, content, date, image) VALUES (?, ?, ?, ?)', 
+    args: [title || '', content || '', date, imageUrl] 
+  });
   
   return {
-    id: result.lastInsertRowid,
+    id: res.lastInsertRowid,
     success: true
   };
 });

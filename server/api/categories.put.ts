@@ -5,8 +5,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb();
-  const stmt = db.prepare('UPDATE categories SET titre = ?, image = ?, description = ?, parent_id = ? WHERE id = ?');
-  stmt.run(body.titre, body.image || null, body.description || null, body.parent_id || null, body.id);
+  await db.execute({ 
+    sql: 'UPDATE categories SET titre = ?, image = ?, description = ?, parent_id = ? WHERE id = ?', 
+    args: [body.titre, body.image || null, body.description || null, body.parent_id || null, body.id] 
+  });
 
   return { success: true };
 });

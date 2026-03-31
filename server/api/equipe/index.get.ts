@@ -1,6 +1,7 @@
 import { useDb } from '../../utils/db';
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const db = useDb();
-  return db.prepare('SELECT * FROM equipe ORDER BY id ASC').all();
+  const rs = await db.execute('SELECT * FROM equipe ORDER BY id ASC');
+  return rs.rows;
 });

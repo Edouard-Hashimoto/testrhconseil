@@ -12,7 +12,8 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
 
   try {
-    const existingTables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((t: any) => t.name);
+    const resTables = await db.execute("SELECT name FROM sqlite_master WHERE type='table'");
+    const existingTables = resTables.rows.map((t: any) => t.name);
     
     if (!existingTables.includes(table)) {
       throw createError({
@@ -21,8 +22,8 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const data = db.prepare(`SELECT * FROM "${table}"`).all();
-    return data;
+    const resData = await db.execute(`SELECT * FROM "${table}"`);
+    return resData.rows;
   } catch (error: any) {
     throw createError({
       statusCode: 500,

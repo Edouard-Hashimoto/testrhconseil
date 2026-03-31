@@ -220,7 +220,7 @@ const deleteMembre = async (id) => {
                   <td>
                     <div class="logo-edit">
                       <span class="text-xs">Image:</span>
-                      <img v-if="editData.image" :src="`/equipe-images/${editData.image}`" class="logo-thumb" />
+                      <img v-if="editData.image" :src="useAssetUrl(editData.image, 'equipe')" class="logo-thumb" />
                       <input type="file" name="imageEdit" accept="image/*" class="file-input-sm" />
                     </div>
                   </td>
@@ -237,7 +237,7 @@ const deleteMembre = async (id) => {
                   </td>
                   <td>
                     <div class="flex items-center gap-2">
-                      <img v-if="membre.image" :src="`/equipe-images/${membre.image}`" class="logo-thumb" />
+                      <img v-if="membre.image" :src="useAssetUrl(membre.image, 'equipe')" class="logo-thumb" />
                       <span v-else class="no-logo">Aucune</span>
                     </div>
                   </td>

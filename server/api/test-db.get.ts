@@ -1,13 +1,12 @@
 export default defineEventHandler(async (event) => {
   const db = useDb();
   
-  const insert = db.prepare('INSERT INTO test (name) VALUES (?)');
-  insert.run(`Test at ${new Date().toISOString()}`);
+  await db.execute({ sql: 'INSERT INTO test (name) VALUES (?)', args: [`Test at ${new Date().toISOString()}`] });
   
-  const rows = db.prepare('SELECT * FROM test').all();
+  const res = await db.execute('SELECT * FROM test');
   
   return {
-    message: "Base de données SQLite opérationnelle !",
-    data: rows
+    message: "Base de données Turso opérationnelle !",
+    data: res.rows
   };
 });

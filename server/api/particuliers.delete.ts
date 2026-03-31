@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb();
-  db.prepare('DELETE FROM particuliers WHERE id = ?').run(body.id);
+  await db.execute({ sql: 'DELETE FROM particuliers WHERE id = ?', args: [body.id] });
 
   return { success: true };
 });

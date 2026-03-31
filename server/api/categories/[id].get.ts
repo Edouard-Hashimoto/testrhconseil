@@ -3,7 +3,8 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   
   // Fetch category
-  const category = db.prepare('SELECT * FROM categories WHERE id = ?').get(id);
+  const resCat = await db.execute({ sql: 'SELECT * FROM categories WHERE id = ?', args: [id as string] });
+  const category = resCat.rows[0];
   
   if (!category) {
     throw createError({
@@ -13,10 +14,12 @@ export default defineEventHandler(async (event) => {
   }
   
   // Fetch child categories (subcategories)
-  const subcategories = db.prepare('SELECT * FROM categories WHERE parent_id = ? ORDER BY titre ASC').all(id);
+  const resSubs = await db.execute({ sql: 'SELECT * FROM categories WHERE parent_id = ? ORDER BY titre ASC', args: [id as string] });
+  const subcategories = resSubs.rows;
   
   // Fetch linked services
-  const services = db.prepare('SELECT * FROM services WHERE category_id = ? ORDER BY created_at ASC').all(id);
+  const resServs = await db.execute({ sql: 'SELECT * FROM services WHERE category_id = ? ORDER BY created_at ASC', args: [id as string] });
+  const services = resServs.rows;
   
   return {
     ...category,
