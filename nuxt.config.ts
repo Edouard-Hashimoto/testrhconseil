@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    preset: 'netlify',
     rollupConfig: {
       external: ['@prisma/client', '.prisma/client']
     }
