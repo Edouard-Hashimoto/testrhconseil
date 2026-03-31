@@ -8,7 +8,7 @@ const fileInput = ref(null)
 
 const newStat = ref({ title: '', text: '' })
 const editingId = ref(null)
-const editData = ref({ title: '', text: '' })
+const editData = ref({ title: '', text: '', image: '' })
 
 const handleFileChange = (e) => {
   imageFile.value = e.target.files[0]
@@ -17,16 +17,22 @@ const handleFileChange = (e) => {
 const addStat = async () => {
   if (!newStat.value.title || !newStat.value.text) return
   isSending.value = true
-  
-  const formData = new FormData()
-  formData.append('title', newStat.value.title)
-  formData.append('text', newStat.value.text)
-  if (imageFile.value) {
-    formData.append('image', imageFile.value)
-  }
 
   try {
-    await $fetch('/api/statistics', { method: 'POST', body: formData })
+    let imageUrl = null
+
+    // Upload image separately if present
+    if (imageFile.value) {
+      const imageFormData = new FormData()
+      imageFormData.append('file', imageFile.value)
+      const uploadResult = await $fetch('/api/upload-news-image', { method: 'POST', body: imageFormData })
+      imageUrl = uploadResult.url
+    }
+
+    await $fetch('/api/statistics', {
+      method: 'POST',
+      body: { title: newStat.value.title, text: newStat.value.text, imageUrl }
+    })
     newStat.value = { title: '', text: '' }
     imageFile.value = null
     if (fileInput.value) fileInput.value.value = ''
@@ -47,16 +53,20 @@ const saveEdit = async () => {
   if (!editData.value.title || !editData.value.text) return
   isSending.value = true
 
-  const formData = new FormData()
-  formData.append('title', editData.value.title)
-  formData.append('text', editData.value.text)
-  // Re-use current image if no new file is selected, but API is designed to only update if image is present
-  if (imageFile.value) {
-    formData.append('image', imageFile.value)
-  }
-
   try {
-    await $fetch(`/api/statistics?id=${editingId.value}`, { method: 'PUT', body: formData })
+    let imageUrl = editData.value.image || null
+
+    if (imageFile.value) {
+      const imageFormData = new FormData()
+      imageFormData.append('file', imageFile.value)
+      const uploadResult = await $fetch('/api/upload-news-image', { method: 'POST', body: imageFormData })
+      imageUrl = uploadResult.url
+    }
+
+    await $fetch(`/api/statistics?id=${editingId.value}`, {
+      method: 'PUT',
+      body: { title: editData.value.title, text: editData.value.text, imageUrl }
+    })
     editingId.value = null
     imageFile.value = null
     await refresh()

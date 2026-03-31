@@ -18,16 +18,28 @@ const handleFileChange = (e) => {
 const addArticle = async () => {
   if (!newArticle.value.title || !newArticle.value.content) return
   isSending.value = true
-  
-  const formData = new FormData()
-  formData.append('title', newArticle.value.title)
-  formData.append('content', newArticle.value.content)
-  if (imageFile.value) {
-    formData.append('image', imageFile.value)
-  }
 
   try {
-    await $fetch('/api/news', { method: 'POST', body: formData })
+    let imageUrl = null
+
+    // 1. Upload image separately if present
+    if (imageFile.value) {
+      const imageFormData = new FormData()
+      imageFormData.append('file', imageFile.value)
+      const uploadResult = await $fetch('/api/upload-news-image', { method: 'POST', body: imageFormData })
+      imageUrl = uploadResult.url
+    }
+
+    // 2. Send article as JSON
+    await $fetch('/api/news', {
+      method: 'POST',
+      body: {
+        title: newArticle.value.title,
+        content: newArticle.value.content,
+        imageUrl
+      }
+    })
+
     newArticle.value = { title: '', content: '' }
     imageFile.value = null
     if (fileInput.value) fileInput.value.value = ''

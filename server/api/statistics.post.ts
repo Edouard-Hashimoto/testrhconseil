@@ -1,26 +1,12 @@
+import { requireAuth } from '../utils/auth';
+import { useDb } from '../utils/db';
+
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   const db = useDb();
-  
-  const formData = await readMultipartFormData(event);
-  if (!formData) {
-    throw createError({ statusCode: 400, statusMessage: 'FormData manquant' });
-  }
 
-  let title = '';
-  let text = '';
-  let imageUrl: string | null = null;
-
-  for (const item of formData) {
-    if (item.name === 'title' && item.data) {
-      title = item.data.toString();
-    } else if (item.name === 'text' && item.data) {
-      text = item.data.toString();
-    } else if (item.name === 'image' && item.filename && item.data.length > 0) {
-      const { url } = await uploadToCloudinary(item.data, 'stats');
-      imageUrl = url;
-    }
-  }
+  const body = await readBody(event);
+  const { title, text, imageUrl } = body || {};
 
   if (!title || !text) {
     throw createError({
@@ -29,13 +15,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const res = await db.execute({ 
-    sql: 'INSERT INTO statistics (title, text, image) VALUES (?, ?, ?)', 
-    args: [title, text, imageUrl] 
+  const res = await db.execute({
+    sql: 'INSERT INTO statistics (title, text, image) VALUES (?, ?, ?)',
+    args: [title, text, imageUrl || null],
   });
 
   return {
     id: res.lastInsertRowid,
-    success: true
+    success: true,
   };
 });
