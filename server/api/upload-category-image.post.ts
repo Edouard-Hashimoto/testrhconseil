@@ -1,4 +1,8 @@
+import { requireAuth } from '../utils/auth';
+import { uploadToCloudinary } from '../utils/cloudinary';
+
 export default defineEventHandler(async (event) => {
+  requireAuth(event);
   const formData = await readFormData(event);
   const file = formData.get('file') as File | null;
 

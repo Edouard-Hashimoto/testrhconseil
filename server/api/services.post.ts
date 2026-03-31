@@ -1,4 +1,8 @@
+import { useDb } from '../utils/db';
+import { requireAuth } from '../utils/auth';
+
 export default defineEventHandler(async (event) => {
+  requireAuth(event);
   const body = await readBody(event);
   if (!body?.title) {
     throw createError({ statusCode: 400, statusMessage: 'Le titre est requis' });

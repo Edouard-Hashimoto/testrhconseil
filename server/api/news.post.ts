@@ -1,3 +1,7 @@
+import { requireAuth } from '../utils/auth';
+import { useDb } from '../utils/db';
+import { uploadToCloudinary } from '../utils/cloudinary';
+
 export default defineEventHandler(async (event) => {
   requireAuth(event);
   
@@ -33,7 +37,7 @@ export default defineEventHandler(async (event) => {
   
   const res = await db.execute({ 
     sql: 'INSERT INTO news (title, content, date, image) VALUES (?, ?, ?, ?)', 
-    args: [title || '', content || '', date, imageUrl] 
+    args: [title, content, date, imageUrl] as any
   });
   
   return {

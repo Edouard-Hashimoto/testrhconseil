@@ -1,3 +1,6 @@
+import { uploadToCloudinary } from '../utils/cloudinary';
+import { useDb } from '../utils/db';
+
 export default defineEventHandler(async (event) => {
   const formData = await readFormData(event)
   const file = formData.get('file') as File | null
