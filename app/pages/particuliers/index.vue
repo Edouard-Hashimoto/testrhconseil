@@ -28,7 +28,7 @@ useHead({
           class="service-card"
         >
           <div class="card-icon">
-            <img v-if="part.picto" :src="`/uploads/${part.picto}`" :alt="part.titre" />
+            <img v-if="part.picto" :src="useAssetUrl(part.picto, 'particulier')" :alt="part.titre" />
           </div>
           <div class="card-content">
             <h3 class="card-title">{{ part.titre }}</h3>

@@ -311,8 +311,9 @@ useHead({
 }
 
 .circle-border {
-  width: 330px;
-  height: 330px;
+  width: 100%;
+  max-width: 330px;
+  aspect-ratio: 1/1;
   border-radius: 50%;
   padding: 10px;
   border: 4px solid #42B9B5;
@@ -367,8 +368,7 @@ useHead({
   }
   
   .circle-border {
-    width: 320px;
-    height: 320px;
+    max-width: 320px;
   }
 
   .building-text p {

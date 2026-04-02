@@ -8,7 +8,7 @@ const refresh = async () => {
   await refreshServices()
 }
 
-const newService = ref({ title: '', color: '#6b21a8', description: '', category_id: null })
+const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [] })
 const editingId = ref(null)
 const editData = ref({})
 const uploading = ref(false)
@@ -44,7 +44,7 @@ const createService = async (evt) => {
     let logo = null
     if (file) logo = await uploadLogo(file)
     await $fetch('/api/services', { method: 'POST', body: { ...newService.value, logo } })
-    newService.value = { title: '', color: '#6b21a8', description: '', category_id: null }
+    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [] }
     if (fileInput) fileInput.value = ''
     await refresh()
   } catch (e) {
@@ -56,7 +56,10 @@ const createService = async (evt) => {
 
 const startEdit = (service) => {
   editingId.value = service.id
-  editData.value = { ...service }
+  editData.value = { 
+    ...service, 
+    category_ids: service.category_ids || [] 
+  }
 }
 
 const saveEdit = async (evt) => {
@@ -178,12 +181,14 @@ const deleteService = async (id) => {
             <label>Logo (image)</label>
             <input type="file" accept="image/*" class="file-input" />
           </div>
-          <div class="field grow">
-            <label>Catégorie</label>
-            <select v-model="newService.category_id" class="edit-input" style="height: 38px;">
-              <option :value="null">Aucune</option>
-              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.titre }}</option>
-            </select>
+          <div class="field grow basis-full">
+            <label>Catégories</label>
+            <div class="checkbox-grid">
+              <label v-for="cat in categories" :key="cat.id" class="checkbox-item">
+                <input type="checkbox" :value="cat.id" v-model="newService.category_ids" />
+                <span>{{ cat.titre }}</span>
+              </label>
+            </div>
           </div>
           <div class="field basis-full">
             <label>Description</label>
@@ -214,7 +219,7 @@ const deleteService = async (id) => {
             <thead>
               <tr>
                 <th>Couleur</th>
-                <th>Catégorie</th>
+                <th>Catégories</th>
                 <th>Titre / Description</th>
                 <th>Logo</th>
                 <th class="text-right">Actions</th>
@@ -225,10 +230,12 @@ const deleteService = async (id) => {
                 <template v-if="editingId === service.id">
                   <td><input v-model="editData.color" type="color" class="color-pick-small" /></td>
                   <td>
-                    <select v-model="editData.category_id" class="edit-input" style="width: 100%;">
-                      <option :value="null">Aucune</option>
-                      <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.titre }}</option>
-                    </select>
+                    <div class="checkbox-grid-mini">
+                      <label v-for="cat in categories" :key="cat.id" class="checkbox-item-mini">
+                        <input type="checkbox" :value="cat.id" v-model="editData.category_ids" />
+                        <span>{{ cat.titre }}</span>
+                      </label>
+                    </div>
                   </td>
                   <td>
                     <input v-model="editData.title" class="edit-input mb-2" style="width: 100%;" />
@@ -250,9 +257,11 @@ const deleteService = async (id) => {
                     <div class="color-swatch" :style="{ background: service.color }"></div>
                   </td>
                   <td>
-                    <span v-if="service.category_id" class="stat-pill" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;">
-                      {{ categories?.find(c => c.id === service.category_id)?.titre || '?' }}
-                    </span>
+                    <div class="tag-container" v-if="service.category_ids && service.category_ids.length > 0">
+                      <span v-for="catId in service.category_ids" :key="catId" class="stat-pill-sm">
+                        {{ categories?.find(c => c.id === catId)?.titre || '?' }}
+                      </span>
+                    </div>
                     <span v-else class="no-logo">Aucune</span>
                   </td>
                   <td>
@@ -397,4 +406,15 @@ const deleteService = async (id) => {
 .preview-title { font-size: 0.82rem; font-weight: 600; color: #fff; line-height: 1.3; position: relative; z-index: 1; }
 .preview-logo { position: absolute; bottom: 0.5rem; right: 0.5rem; width: 40px; height: 40px; object-fit: contain; opacity: 0.18; }
 .preview-empty { grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 0.875rem; padding: 2rem; }
+.checkbox-grid { display: flex; flex-wrap: wrap; gap: 0.8rem; background: #f8fafc; padding: 1rem; border: 1.5px solid #e2e8f0; border-radius: 9px; }
+.checkbox-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600; color: #475569; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 6px; transition: background 0.2s; }
+.checkbox-item:hover { background: #f1f5f9; }
+.checkbox-item input { width: 16px; height: 16px; accent-color: #e91e8c; cursor: pointer; }
+
+.checkbox-grid-mini { display: flex; flex-direction: column; gap: 0.3rem; max-height: 120px; overflow-y: auto; padding: 0.4rem; background: #f8fafc; border: 1.1px solid #e2e8f0; border-radius: 6px; min-width: 140px; }
+.checkbox-item-mini { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 500; color: #64748b; cursor: pointer; }
+.checkbox-item-mini input { width: 14px; height: 14px; accent-color: #e91e8c; }
+
+.tag-container { display: flex; flex-wrap: wrap; gap: 0.35rem; max-width: 180px; }
+.stat-pill-sm { font-size: 0.65rem; font-weight: 700; color: #e91e8c; background: rgba(233, 30, 140, 0.08); border: 1px solid rgba(233, 30, 140, 0.15); border-radius: 12px; padding: 0.15rem 0.45rem; white-space: nowrap; }
 </style>

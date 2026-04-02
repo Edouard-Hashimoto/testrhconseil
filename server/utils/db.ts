@@ -87,8 +87,21 @@ export const initDb = async () => {
       text TEXT NOT NULL,
       image TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS service_categories (
+      service_id INTEGER NOT NULL,
+      category_id INTEGER NOT NULL,
+      PRIMARY KEY (service_id, category_id),
+      FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
+      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
     )`
   ], "write");
+
+  // Migration des données existantes vers la table de jointure
+  await db.execute(`
+    INSERT OR IGNORE INTO service_categories (service_id, category_id)
+    SELECT id, category_id FROM services WHERE category_id IS NOT NULL
+  `);
 
   // Initialisation des settings par défaut
   await db.execute({
