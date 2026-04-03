@@ -18,8 +18,11 @@ useHead({
       <nav class="breadcrumb">
         <NuxtLink to="/">Accueil</NuxtLink>
         <span class="sep">/</span>
-        <template v-if="service.category_id">
-          <NuxtLink :to="`/categories/${service.category_id}`">{{ service.category_titre }}</NuxtLink>
+        <template v-if="service.categories && service.categories.length > 0">
+          <span v-for="(cat, idx) in service.categories" :key="cat.id" style="display:inline-flex; align-items:center;">
+            <NuxtLink :to="`/categories/${cat.id}`">{{ cat.titre }}</NuxtLink>
+            <span class="sep" v-if="idx !== service.categories.length - 1">, </span>
+          </span>
           <span class="sep">/</span>
         </template>
         <span class="curr">{{ service.title }}</span>
@@ -46,11 +49,11 @@ useHead({
         </div>
 
         <aside class="service-sidebar">
-          <div v-if="service.category_id" class="sidebar-categories">
-            <span class="sidebar-label">Catégorie</span>
+          <div v-if="service.categories && service.categories.length > 0" class="sidebar-categories">
+            <span class="sidebar-label">Catégorie(s)</span>
             <div class="tags-list">
-              <NuxtLink :to="`/categories/${service.category_id}`" class="category-tag">
-                {{ service.category_titre }}
+              <NuxtLink v-for="cat in service.categories" :key="cat.id" :to="`/categories/${cat.id}`" class="category-tag">
+                {{ cat.titre }}
               </NuxtLink>
             </div>
           </div>

@@ -1,16 +1,23 @@
 export default defineEventHandler(async () => {
   const db = useDb();
+  
+  // Requête 1 : Obtenir tous les services
   const res = await db.execute('SELECT * FROM services ORDER BY created_at ASC');
-  const services = res.rows as any[];
-
-  // On récupère les catégories pour chaque service
-  for (const s of services) {
-    const catRes = await db.execute({
-      sql: 'SELECT category_id FROM service_categories WHERE service_id = ?',
-      args: [s.id]
-    });
-    s.category_ids = catRes.rows.map(r => r.category_id);
+  
+  // Requête 2 : Obtenir toutes les associations dans un seul appel (évite les requêtes N+1)
+  const relations = await db.execute('SELECT service_id, category_id FROM service_categories');
+  
+  const catsMap: Record<string, number[]> = {};
+  for (const row of relations.rows) {
+    const sId = String(row.service_id);
+    if (!catsMap[sId]) catsMap[sId] = [];
+    catsMap[sId].push(Number(row.category_id));
   }
 
-  return services;
+  // Combiner les résultats en mémoire et forcer les types de base (Number) pour éviter les erreurs BigInt en production
+  return res.rows.map((s: any) => ({
+    ...s,
+    id: Number(s.id),
+    category_ids: catsMap[String(s.id)] || []
+  }));
 });
