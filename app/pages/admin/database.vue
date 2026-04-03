@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 definePageMeta({ middleware: 'auth' })
 
 const { data: tables, pending: loadingTables } = await useFetch('/api/admin/db-tables')
@@ -24,6 +24,22 @@ const handleLogout = async () => {
     navigateTo('/admin/login')
   } catch (e) {
     alert("Erreur lors de la déconnexion")
+  }
+}
+
+const initializing = ref(false)
+const runInitDb = async () => {
+  if (!confirm("Cette opération va vérifier et créer les tables manquantes. Continuer ?")) return
+  initializing.value = true
+  try {
+    const res = await $fetch('/api/admin/init-db')
+    alert(res.message || "Initialisation réussie")
+    const { data: updatedTables } = await useFetch('/api/admin/db-tables')
+    if (updatedTables.value) tables.value = updatedTables.value
+  } catch (e) {
+    alert("Erreur lors de l'initialisation")
+  } finally {
+    initializing.value = false
   }
 }
 
@@ -123,7 +139,13 @@ const columns = computed(() => {
             <div>
               <h2 class="content-title">{{ selectedTable }}</h2>
             </div>
-            <span class="row-badge">{{ tableData.length }} ligne(s)</span>
+            <div class="header-actions">
+              <button @click="runInitDb" class="btn-init" :disabled="initializing">
+                <span v-if="initializing" class="spinner-tiny"></span>
+                Vérifier/Initialiser les tables
+              </button>
+              <span class="row-badge">{{ tableData.length }} ligne(s)</span>
+            </div>
           </div>
 
           <div class="table-wrap">
@@ -270,6 +292,47 @@ const columns = computed(() => {
 
 .content-header {
   display: flex; align-items: center; justify-content: space-between;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-init {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-init:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #e91e8c;
+  color: #e91e8c;
+}
+
+.btn-init:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner-tiny {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(233, 30, 140, 0.2);
+  border-top-color: #e91e8c;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
 .content-title { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0; }

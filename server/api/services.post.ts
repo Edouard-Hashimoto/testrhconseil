@@ -26,11 +26,15 @@ export default defineEventHandler(async (event) => {
 
   // 2. Insertion des catégories dans la table de jointure
   if (body.category_ids && Array.isArray(body.category_ids)) {
-    for (const catId of body.category_ids) {
-      await db.execute({
-        sql: 'INSERT INTO service_categories (service_id, category_id) VALUES (?, ?)',
-        args: [serviceId, catId]
-      });
+    try {
+      for (const catId of body.category_ids) {
+        await db.execute({
+          sql: 'INSERT INTO service_categories (service_id, category_id) VALUES (?, ?)',
+          args: [serviceId, catId]
+        });
+      }
+    } catch (e) {
+      console.log('Ignore service_categories insertion, table does not exist online');
     }
   }
 

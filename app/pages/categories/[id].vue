@@ -44,6 +44,16 @@ useHead({
           </NuxtLink>
         </div>
       </div>
+      
+      <div v-if="category.services && category.services.length > 0" class="services-section">
+        <h2 class="section-title">Prestations proposées</h2>
+        <div class="services-grid-card">
+          <NuxtLink v-for="service in category.services" :key="service.id" :to="`/services/${service.id}`" class="service-card-item" :style="{ background: service.color }">
+            <span class="service-title-card">{{ service.title }}</span>
+            <img v-if="service.logo" :src="useAssetUrl(service.logo, 'logo')" class="service-logo-card" alt="" />
+          </NuxtLink>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -207,6 +217,53 @@ useHead({
   color: #64748b;
   line-height: 1.5;
   margin: 0;
+}
+
+.services-section {
+  margin-top: 4rem;
+}
+
+.services-grid-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.service-card-item {
+  border-radius: 16px;
+  min-height: 120px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.service-title-card {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  z-index: 1;
+}
+
+.service-logo-card {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  opacity: 0.25;
+  transform: rotate(-10deg);
 }
 
 @media (max-width: 600px) {

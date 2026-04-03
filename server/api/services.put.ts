@@ -22,18 +22,22 @@ export default defineEventHandler(async (event) => {
 
   // 2. Mise à jour des catégories dans la table de jointure
   if (body.category_ids && Array.isArray(body.category_ids)) {
-    // On vide les anciennes relations
-    await db.execute({
-      sql: 'DELETE FROM service_categories WHERE service_id = ?',
-      args: [serviceId]
-    });
-
-    // On insère les nouvelles
-    for (const catId of body.category_ids) {
+    try {
+      // On vide les anciennes relations
       await db.execute({
-        sql: 'INSERT INTO service_categories (service_id, category_id) VALUES (?, ?)',
-        args: [serviceId, catId]
+        sql: 'DELETE FROM service_categories WHERE service_id = ?',
+        args: [serviceId]
       });
+
+      // On insère les nouvelles
+      for (const catId of body.category_ids) {
+        await db.execute({
+          sql: 'INSERT INTO service_categories (service_id, category_id) VALUES (?, ?)',
+          args: [serviceId, catId]
+        });
+      }
+    } catch (e) {
+      console.log('Ignore service_categories update, table does not exist online');
     }
   }
 
