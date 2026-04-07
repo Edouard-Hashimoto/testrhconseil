@@ -12,7 +12,10 @@ export default defineEventHandler(async () => {
     for (const row of relations.rows) {
       const sId = String(row.service_id);
       if (!catsMap[sId]) catsMap[sId] = [];
-      catsMap[sId].push(Number(row.category_id));
+      const catId = Number(row.category_id);
+      if (!isNaN(catId)) {
+        catsMap[sId].push(catId);
+      }
     }
   } catch (e) {
     // La table n'existe probablement pas encore en production (init-db non lancé en ligne)

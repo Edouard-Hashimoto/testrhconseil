@@ -58,7 +58,7 @@ const startEdit = (service) => {
   editingId.value = service.id
   editData.value = { 
     ...service, 
-    category_ids: service.category_ids || [] 
+    category_ids: (service.category_ids || []).map(Number)
   }
 }
 
@@ -185,7 +185,7 @@ const deleteService = async (id) => {
             <label>Catégories</label>
             <div class="checkbox-grid">
               <label v-for="cat in categories" :key="cat.id" class="checkbox-item">
-                <input type="checkbox" :value="cat.id" v-model="newService.category_ids" />
+                <input type="checkbox" :value="Number(cat.id)" v-model="newService.category_ids" />
                 <span>{{ cat.titre }}</span>
               </label>
             </div>
@@ -232,7 +232,7 @@ const deleteService = async (id) => {
                   <td>
                     <div class="checkbox-grid-mini">
                       <label v-for="cat in categories" :key="cat.id" class="checkbox-item-mini">
-                        <input type="checkbox" :value="cat.id" v-model="editData.category_ids" />
+                        <input type="checkbox" :value="Number(cat.id)" v-model="editData.category_ids" />
                         <span>{{ cat.titre }}</span>
                       </label>
                     </div>

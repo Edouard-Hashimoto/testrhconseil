@@ -9,9 +9,9 @@ export default defineEventHandler(async (event) => {
       LEFT JOIN categories c2 ON c1.parent_id = c2.id
       ORDER BY c1.created_at DESC
     `);
-    return res.rows;
+    return res.rows.map((r: any) => ({ ...r, id: Number(r.id) }));
   }
   
   const res = await db.execute('SELECT * FROM categories ORDER BY created_at DESC');
-  return res.rows;
+  return res.rows.map((r: any) => ({ ...r, id: Number(r.id) }));
 });

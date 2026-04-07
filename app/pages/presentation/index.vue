@@ -11,8 +11,6 @@ useHead({
   <div class="pres-page">
 
     <section class="pres-hero">
-      <img src="~/assets/img/fond_presentation.webp" alt="" class="hero-bg" />
-      <div class="hero-overlay"></div>
       <div class="hero-content">
         <h1 class="hero-title">Qui sommes nous&nbsp;?</h1>
       </div>
@@ -29,7 +27,7 @@ useHead({
 
         <div class="team-text">
           <p class="team-desc">
-            Une équipe de proximité enthousiaste et solidaire et des experts réactifs et agiles pour vous accompagner dans vos projets&nbsp;!
+            UNE ÉQUIPE DE PROXIMITÉ ENTHOUSIASTE ET SOLIDAIRE ET DES EXPERTS RÉACTIFS ET AGILES POUR VOUS ACCOMPAGNER DANS VOS PROJETS&nbsp;!
           </p>
         </div>
 
@@ -88,23 +86,10 @@ useHead({
   overflow: hidden;
   display: flex;
   align-items: center;
-  background-color: #fff;
+  background-color: rgb(66, 185, 181);
 }
 
-.hero-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-}
 
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.25);
-}
 
 .hero-content {
   position: relative;
@@ -181,7 +166,9 @@ useHead({
 }
 
 .team-desc {
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: #444;
   line-height: 1.8;
   text-align: justify;
@@ -208,7 +195,7 @@ useHead({
 }
 
 .member-card {
-  background: linear-gradient(135deg, rgba(66, 185, 181, 0.45) 0%, rgba(163, 21, 68, 0.45) 100%);
+  background: linear-gradient(135deg, rgba(200, 212, 0, 0.45) 0%, rgba(163, 21, 68, 0.45) 100%);
   border-radius: 24px;
   padding: 3rem 1.5rem;
   display: flex;
@@ -259,19 +246,19 @@ useHead({
 }
 
 .member-name {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.55rem;
+  font-weight: 800;
   color: #222;
   margin: 0;
   letter-spacing: 0.02em;
 }
 
 .member-role {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: #444;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .building-section {

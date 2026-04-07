@@ -233,7 +233,7 @@ useHead({
 }
 
 .contact-card h3 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #1a1a2e;
   margin-bottom: 1rem;

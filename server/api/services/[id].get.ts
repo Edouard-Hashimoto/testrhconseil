@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
         JOIN service_categories sc ON sc.category_id = c.id
         WHERE sc.service_id = ?
       `,
-      args: [id as string]
+      args: [Number(id)]
     });
     category_ids = catRes.rows.map(r => Number(r.id));
     categories = catRes.rows.map(r => ({ ...r, id: Number(r.id) }));

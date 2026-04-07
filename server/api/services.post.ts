@@ -27,14 +27,15 @@ export default defineEventHandler(async (event) => {
   // 2. Insertion des catégories dans la table de jointure
   if (body.category_ids && Array.isArray(body.category_ids)) {
     try {
-      for (const catId of body.category_ids) {
+      const categoryIds = body.category_ids.map(Number);
+      for (const catId of categoryIds) {
         await db.execute({
           sql: 'INSERT INTO service_categories (service_id, category_id) VALUES (?, ?)',
-          args: [serviceId, catId]
+          args: [Number(serviceId), catId]
         });
       }
-    } catch (e) {
-      console.log('Ignore service_categories insertion, table does not exist online');
+    } catch (e: any) {
+      console.error('Erreur insertion service_categories:', e.message);
     }
   }
 

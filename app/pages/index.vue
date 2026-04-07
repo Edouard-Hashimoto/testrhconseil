@@ -47,7 +47,7 @@ onMounted(() => {
           </h1>
         </div>
         <div class="hero-img">
-          <img src="~/assets/img/Bloc_Accueil.webp" alt="RH Conseil 71 — Diversité de compétences" />
+          <img src="~/assets/img/logo_rhc.png" alt="RH Conseil 71 — Diversité de compétences" />
         </div>
       </div>
     </section>
@@ -113,10 +113,10 @@ onMounted(() => {
     <section class="presentation-section">
       <div class="pres-inner">
         <div class="pres-text">
-          <h2 class="pres-title">PRÉSENTATION DE <strong>RH CONSEIL 71</strong></h2>
+          <h2 class="pres-title">PRÉSENTATION DE <br> <strong>RH CONSEIL 71</strong></h2>
           <p class="pres-para">Cabinet à taille humaine, RH CONSEIL 71 a été créé en 2004. Nous accompagnons les entreprises dans la recherche de performances et le développement des compétences dans les domaines RH, RECRUTEMENT et QHSE.</p>
           <p class="pres-para">Longtemps certifié ISO 9001 et toujours en démarche d’amélioration continue, RH Conseil 71 considère que la qualité fait partie intégrante de sa culture, au bénéfice de ses clients.</p>
-          <NuxtLink to="/presentation" class="pres-btn">En savoir plus</NuxtLink>
+          <NuxtLink to="/presentation" class="pres-btn">Découvrir l'équipe</NuxtLink>
         </div>
 
         <div ref="presImgRef" class="pres-img-wrap">
@@ -525,7 +525,7 @@ onMounted(() => {
 }
 
 .stat-card.actu {
-  background: #2d4a3e;
+  background: #000000;
 }
 
 .stat-card-body {
@@ -573,7 +573,7 @@ onMounted(() => {
 }
 
 .actu-action {
-  color: #2d4a3e;
+  color: #000000;
 }
 
 .stat-card-bg {
@@ -622,10 +622,10 @@ onMounted(() => {
 }
 
 .service-title {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: #fff;
-  line-height: 1.3;
+  line-height: 1.25;
   position: relative;
   z-index: 1;
 }
@@ -741,7 +741,7 @@ onMounted(() => {
   }
 
   .service-title {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 }
 
