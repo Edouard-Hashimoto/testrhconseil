@@ -15,7 +15,7 @@ useHead({
 
       <div class="content-card">
         <div class="logo-side">
-          <img src="~/assets/img/lindustrie-recrute.png" alt="L'industrie recrute" class="partner-logo" />
+          <img src="~/assets/img/vignette_industrie_recrute.png" alt="L'industrie recrute" class="partner-logo" />
         </div>
         <div class="text-side">
           <h2 class="content-heading">L'industrie recrute !</h2>
