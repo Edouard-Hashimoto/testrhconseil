@@ -43,7 +43,7 @@ onMounted(() => {
       <div class="hero-inner">
         <div class="hero-text">
           <h1 class="hero-title">
-            Une <span class="hero-accent">diversité</span> de&nbsp;compétences pour agir
+            Une DIVERSITÉ de&nbsp;COMPÉTENCES pour AGIR
           </h1>
         </div>
         <div class="hero-img">
@@ -55,20 +55,20 @@ onMounted(() => {
       <div class="dashboard-inner">
 
         <div class="left-col">
-          <NuxtLink to="/statistiques" class="stat-card stat-link">
-            <img v-if="mainStat?.image" :src="useAssetUrl(mainStat.image, 'statistics')" class="stat-card-bg" alt="Stats background" />
-            <div class="stat-card-body">
-              <span class="stat-card-label">Statistiques</span>
-              <h2 class="stat-card-title">{{ mainStat?.title || 'Statistiques 2024-2025' }}</h2>
-              <p class="stat-card-action">Voir les statistiques →</p>
-            </div>
-          </NuxtLink>
           <NuxtLink to="/articles" class="stat-card actu stat-link">
             <img v-if="latestNews?.image" :src="useAssetUrl(latestNews.image, 'news')" class="stat-card-bg stat-bg-actu" alt="Actualités" />
             <div class="stat-card-body">
               <span class="stat-card-label">Agenda</span>
               <h2 class="stat-card-title">{{ latestNews?.title || 'Actualités du moment !' }}</h2>
               <p class="stat-card-action actu-action">Voir les actualités →</p>
+            </div>
+          </NuxtLink>
+          <NuxtLink to="/statistiques" class="stat-card stat-link">
+            <img v-if="mainStat?.image" :src="useAssetUrl(mainStat.image, 'statistics')" class="stat-card-bg" alt="Stats background" />
+            <div class="stat-card-body">
+              <span class="stat-card-label">Statistiques</span>
+              <h2 class="stat-card-title">{{ mainStat?.title || 'Statistiques 2024-2025' }}</h2>
+              <p class="stat-card-action">Voir les statistiques →</p>
             </div>
           </NuxtLink>
         </div>
@@ -209,13 +209,13 @@ onMounted(() => {
 
 .hero-title {
   font-size: clamp(1.6rem, 3vw, 2.6rem);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.25;
-  color: #1a1a2e;
-}
-
-.hero-accent {
-  color: #BA0F60;
+  background: linear-gradient(to right, rgba(186, 15, 96, 0.45) 0%, rgba(186, 15, 96, 1) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #BA0F60; /* Fallback */
 }
 
 
