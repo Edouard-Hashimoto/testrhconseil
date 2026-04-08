@@ -94,6 +94,22 @@ export const initDb = async () => {
       PRIMARY KEY (service_id, category_id),
       FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
       FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nom TEXT NOT NULL,
+      prenom TEXT NOT NULL,
+      email TEXT NOT NULL,
+      telephone TEXT,
+      message TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS service_themes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      service_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      objectives TEXT NOT NULL,
+      FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
     )`
   ], "write");
 

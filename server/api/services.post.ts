@@ -39,5 +39,21 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 3. Insertion des thèmes
+  if (body.themes && Array.isArray(body.themes)) {
+    try {
+      for (const theme of body.themes) {
+        if (theme.title && theme.objectives) {
+          await db.execute({
+            sql: 'INSERT INTO service_themes (service_id, title, objectives) VALUES (?, ?, ?)',
+            args: [Number(serviceId), theme.title, theme.objectives]
+          });
+        }
+      }
+    } catch (e: any) {
+      console.error('Erreur insertion service_themes:', e.message);
+    }
+  }
+
   return { id: serviceId?.toString(), ...body };
 });

@@ -48,12 +48,25 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 3. Fetch themes
+  let themes: any[] = [];
+  try {
+    const themeRes = await db.execute({
+      sql: 'SELECT * FROM service_themes WHERE service_id = ?',
+      args: [Number(id)]
+    });
+    themes = themeRes.rows.map(r => ({ ...r, id: Number(r.id) }));
+  } catch (e) {
+    console.log("Table service_themes non encore créée");
+  }
+
   // Construct response gracefully forcing Num types
   const service = {
     ...serviceRes,
     id: Number(serviceRes.id),
     category_ids,
-    categories
+    categories,
+    themes
   };
   
   return service;

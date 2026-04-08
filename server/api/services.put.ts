@@ -42,5 +42,25 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 3. Mise à jour des thèmes
+  if (body.themes && Array.isArray(body.themes)) {
+    try {
+      await db.execute({
+        sql: 'DELETE FROM service_themes WHERE service_id = ?',
+        args: [Number(serviceId)]
+      });
+      for (const theme of body.themes) {
+        if (theme.title && theme.objectives) {
+          await db.execute({
+            sql: 'INSERT INTO service_themes (service_id, title, objectives) VALUES (?, ?, ?)',
+            args: [Number(serviceId), theme.title, theme.objectives]
+          });
+        }
+      }
+    } catch (e: any) {
+      console.error('Erreur update service_themes:', e.message);
+    }
+  }
+
   return { success: true };
 });

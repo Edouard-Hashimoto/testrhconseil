@@ -10,6 +10,11 @@ useHead({
   title: `${service.value?.title || 'Service'} - RH Conseil 71`,
   meta: [{ name: 'description', content: `Découvrez notre service ${service.value?.title}` }]
 })
+
+const openThemeId = ref(null)
+const toggleTheme = (id) => {
+  openThemeId.value = openThemeId.value === id ? null : id
+}
 </script>
 
 <template>
@@ -43,7 +48,35 @@ useHead({
               {{ para }}
             </p>
           </div>
-          <div v-else class="no-description">
+
+          <!-- Accordion Themes -->
+          <div v-if="service.themes && service.themes.length > 0" class="themes-accordion">
+            <div 
+              v-for="theme in service.themes" 
+              :key="theme.id" 
+              class="theme-card"
+              :class="{ 'is-open': openThemeId === theme.id }"
+            >
+              <button class="theme-header" @click="toggleTheme(theme.id)">
+                <span class="theme-title">{{ theme.title }}</span>
+                <span class="theme-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                </span>
+              </button>
+              <div class="theme-body">
+                <div class="theme-body-inner">
+                  <div class="objectives-label">Les objectifs</div>
+                  <ul class="objectives-list">
+                    <li v-for="(line, lidx) in theme.objectives.split('\n').filter(l => l.trim())" :key="lidx">
+                      {{ line }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else-if="!service.description" class="no-description">
             <p>Détails à venir pour ce service...</p>
           </div>
         </div>
@@ -280,5 +313,123 @@ useHead({
     width: 60px;
     height: 60px;
   }
+}
+
+/* Accordion Styles */
+.themes-accordion {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.theme-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-card.is-open {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.theme-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.theme-header:hover {
+  background: #f8fafc;
+}
+
+.theme-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.4;
+  padding-right: 1rem;
+}
+
+.theme-icon {
+  width: 32px;
+  height: 32px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.theme-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.theme-card.is-open .theme-icon {
+  transform: rotate(180deg);
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.theme-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-card.is-open .theme-body {
+  max-height: 1000px; /* High enough to contain content */
+}
+
+.theme-body-inner {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.objectives-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #e91e8c;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.objectives-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.objectives-list li {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #475569;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.objectives-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #e91e8c;
+  font-weight: bold;
 }
 </style>

@@ -8,7 +8,7 @@ const refresh = async () => {
   await refreshServices()
 }
 
-const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [] })
+const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [], themes: [] })
 const editingId = ref(null)
 const editData = ref({})
 const uploading = ref(false)
@@ -43,8 +43,17 @@ const createService = async (evt) => {
   try {
     let logo = null
     if (file) logo = await uploadLogo(file)
-    await $fetch('/api/services', { method: 'POST', body: { ...newService.value, logo } })
-    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [] }
+    
+    const themesToSave = (newService.value.themes || []).map(t => ({
+      ...t,
+      objectives: Array.isArray(t.objectives) ? t.objectives.filter(o => o.trim()).join('\n') : t.objectives
+    }))
+    
+    await $fetch('/api/services', { 
+      method: 'POST', 
+      body: { ...newService.value, logo, themes: themesToSave } 
+    })
+    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [], themes: [] }
     if (fileInput) fileInput.value = ''
     await refresh()
   } catch (e) {
@@ -58,8 +67,33 @@ const startEdit = (service) => {
   editingId.value = service.id
   editData.value = { 
     ...service, 
-    category_ids: (service.category_ids || []).map(Number)
+    category_ids: (service.category_ids || []).map(Number),
+    themes: service.themes ? service.themes.map(t => ({
+      ...t,
+      objectives: t.objectives ? t.objectives.split('\n').filter(o => o.trim()) : ['']
+    })) : []
   }
+}
+
+const addTheme = (target) => {
+  const data = target.value || target
+  if (!data.themes) data.themes = []
+  data.themes.push({ title: '', objectives: [''] })
+}
+
+const removeTheme = (target, index) => {
+  const data = target.value || target
+  data.themes.splice(index, 1)
+}
+
+const addObjective = (theme) => {
+  if (!theme.objectives) theme.objectives = []
+  theme.objectives.push('')
+}
+
+const removeObjective = (theme, index) => {
+  theme.objectives.splice(index, 1)
+  if (theme.objectives.length === 0) theme.objectives.push('')
 }
 
 const saveEdit = async (evt) => {
@@ -69,7 +103,16 @@ const saveEdit = async (evt) => {
   try {
     let logo = editData.value.logo
     if (file) logo = await uploadLogo(file)
-    await $fetch('/api/services', { method: 'PUT', body: { ...editData.value, logo } })
+    
+    const themesToSave = editData.value.themes.map(t => ({
+      ...t,
+      objectives: Array.isArray(t.objectives) ? t.objectives.filter(o => o.trim()).join('\n') : t.objectives
+    }))
+    
+    await $fetch('/api/services', { 
+      method: 'PUT', 
+      body: { ...editData.value, logo, themes: themesToSave } 
+    })
     editingId.value = null
     await refresh()
   } catch (e) {
@@ -191,8 +234,31 @@ const deleteService = async (id) => {
             </div>
           </div>
           <div class="field basis-full">
-            <label>Description</label>
-            <textarea v-model="newService.description" placeholder="Description du service..." rows="3"></textarea>
+            <label>Description introduction (facultatif)</label>
+            <textarea v-model="newService.description" placeholder="Courte introduction avant les thématiques..." rows="2"></textarea>
+          </div>
+          <div class="field basis-full">
+            <div class="themes-header">
+              <label>Thématiques & Objectifs</label>
+              <button type="button" @click="addTheme(newService)" class="btn-add-mini">+ Ajouter une thématique</button>
+            </div>
+            <div class="themes-list">
+              <div v-for="(theme, idx) in newService.themes" :key="idx" class="theme-item-edit">
+                <div class="theme-row-top">
+                  <input v-model="theme.title" type="text" placeholder="Titre de la thématique (ex: Audit sur la classification...)" class="grow" />
+                  <button type="button" @click="removeTheme(newService, idx)" class="btn-remove-mini">×</button>
+                </div>
+                
+                <div class="objectives-edit-section">
+                  <span class="label-tiny">Objectifs</span>
+                  <div v-for="(obj, oIdx) in theme.objectives" :key="oIdx" class="objective-field-row">
+                    <input v-model="theme.objectives[oIdx]" type="text" placeholder="Saisir un objectif..." class="grow" />
+                    <button type="button" @click="removeObjective(theme, oIdx)" class="btn-remove-tiny">×</button>
+                  </div>
+                  <button type="button" @click="addObjective(theme)" class="btn-add-tiny-plain">+ Ajouter un objectif</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="field" style="padding-top: 0.5rem; width: 100%; display: flex; justify-content: flex-end;">
             <button type="submit" :disabled="saving || uploading" class="btn-primary">
@@ -238,8 +304,29 @@ const deleteService = async (id) => {
                     </div>
                   </td>
                   <td>
-                    <input v-model="editData.title" class="edit-input mb-2" style="width: 100%;" />
-                    <textarea v-model="editData.description" class="edit-input" style="width: 100%; font-size: 0.8rem;" rows="2"></textarea>
+                    <input v-model="editData.title" class="edit-input mb-2" style="width: 100%; font-weight: bold;" />
+                    <textarea v-model="editData.description" class="edit-input mb-2" style="width: 100%; font-size: 0.8rem;" rows="1" placeholder="Intro..."></textarea>
+                    
+                    <div class="themes-edit-wrap">
+                      <div class="themes-header-mini">
+                        <span class="label-mini">Thématiques</span>
+                        <button type="button" @click="addTheme(editData)" class="btn-add-mini-plain">+ Ajouter</button>
+                      </div>
+                      <div v-for="(theme, idx) in editData.themes" :key="idx" class="theme-item-mini">
+                         <div class="theme-mini-row">
+                           <input v-model="theme.title" placeholder="Thème" class="mini-input grow" style="font-weight: bold;" />
+                           <button type="button" @click="removeTheme(editData, idx)" class="btn-remove-mini">×</button>
+                         </div>
+                         
+                         <div class="mini-objectives">
+                           <div v-for="(obj, oIdx) in theme.objectives" :key="oIdx" class="mini-objective-row">
+                             <input v-model="theme.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
+                             <button type="button" @click="removeObjective(theme, oIdx)" class="btn-remove-tiny">×</button>
+                           </div>
+                           <button type="button" @click="addObjective(theme)" class="btn-add-tiny-plain" style="font-size: 0.6rem;">+ Obj.</button>
+                         </div>
+                      </div>
+                    </div>
                   </td>
                   <td>
                     <div class="logo-edit">
@@ -335,7 +422,7 @@ const deleteService = async (id) => {
 .sidebar-logout { margin-top: auto; display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1rem; border-top: 1px solid rgba(255,255,255,0.08); background: none; border-left: none; border-right: none; border-bottom: none; color: rgba(255,255,255,0.45); font-size: 0.82rem; cursor: pointer; transition: color 0.2s; width: 100%; }
 .sidebar-logout svg { width: 17px; height: 17px; }
 .sidebar-logout:hover { color: #f87171; }
-.main-content { flex: 1; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; max-width: 960px; }
+.main-content { flex: 1; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; max-width: 1300px; margin: 0 auto; width: 100%; }
 
 .page-header { display: flex; align-items: flex-start; justify-content: space-between; }
 .page-title { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin: 0; }
@@ -411,10 +498,37 @@ const deleteService = async (id) => {
 .checkbox-item:hover { background: #f1f5f9; }
 .checkbox-item input { width: 16px; height: 16px; accent-color: #e91e8c; cursor: pointer; }
 
-.checkbox-grid-mini { display: flex; flex-direction: column; gap: 0.3rem; max-height: 120px; overflow-y: auto; padding: 0.4rem; background: #f8fafc; border: 1.1px solid #e2e8f0; border-radius: 6px; min-width: 140px; }
+.checkbox-grid-mini { display: flex; flex-direction: column; gap: 0.35rem; max-height: 250px; overflow-y: auto; padding: 0.6rem; background: #f8fafc; border: 1.1px solid #e2e8f0; border-radius: 6px; min-width: 180px; }
 .checkbox-item-mini { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 500; color: #64748b; cursor: pointer; }
 .checkbox-item-mini input { width: 14px; height: 14px; accent-color: #e91e8c; }
 
 .tag-container { display: flex; flex-wrap: wrap; gap: 0.35rem; max-width: 180px; }
 .stat-pill-sm { font-size: 0.65rem; font-weight: 700; color: #e91e8c; background: rgba(233, 30, 140, 0.08); border: 1px solid rgba(233, 30, 140, 0.15); border-radius: 12px; padding: 0.15rem 0.45rem; white-space: nowrap; }
+
+.themes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.btn-add-mini { font-size: 0.72rem; font-weight: 700; color: #e91e8c; background: #fff; border: 1.5px dashed #e91e8c; border-radius: 8px; padding: 0.4rem 0.8rem; cursor: pointer; }
+.themes-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 0.5rem; }
+.theme-item-edit { display: flex; flex-direction: column; gap: 0.6rem; padding: 1.25rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+.theme-row-top { display: flex; gap: 0.6rem; align-items: center; }
+.theme-row-top input { font-weight: 700; font-size: 0.95rem; padding: 0.6rem 0.8rem; }
+.btn-remove-mini { color: #dc2626; font-size: 1.3rem; background: none; border: none; cursor: pointer; padding: 0 0.5rem; display: flex; align-items: center; opacity: 0.6; transition: opacity 0.2s; }
+.btn-remove-mini:hover { opacity: 1; }
+.themes-edit-wrap { margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1rem; }
+.themes-header-mini { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.label-mini { font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.btn-add-mini-plain { font-size: 0.72rem; font-weight: 800; color: #e91e8c; background: rgba(233, 30, 140, 0.05); border: 1px solid rgba(233, 30, 140, 0.2); border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+.theme-item-mini { margin-bottom: 1rem; padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; }
+.theme-mini-row { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
+.mini-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.85rem; outline: none; background: #fff; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+.mini-input:focus { border-color: #e91e8c; box-shadow: 0 0 0 2px rgba(233,30,140,0.05); }
+
+.objectives-edit-section { margin-top: 0.75rem; padding: 1rem; background: #f1f5f9; border-radius: 8px; border: 1px solid #e2e8f0; }
+.label-tiny { font-size: 0.65rem; font-weight: 900; text-transform: uppercase; color: #64748b; margin-bottom: 0.6rem; display: block; letter-spacing: 0.05em; }
+.objective-field-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+.objective-field-row input { padding: 0.5rem 0.75rem; }
+.btn-remove-tiny { color: #94a3b8; font-size: 1.1rem; background: none; border: none; cursor: pointer; transition: color 0.2s; }
+.btn-remove-tiny:hover { color: #dc2626; }
+.btn-add-tiny-plain { font-size: 0.75rem; font-weight: 800; color: #e91e8c; background: #fff; border: 1px solid rgba(233, 30, 140, 0.2); border-radius: 6px; padding: 0.3rem 0.8rem; cursor: pointer; margin-top: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.mini-objectives { padding-left: 0.75rem; border-left: 3px solid #e2e8f0; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.mini-objective-row { display: flex; gap: 0.35rem; align-items: center; }
 </style>
