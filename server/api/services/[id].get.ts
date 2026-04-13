@@ -60,13 +60,26 @@ export default defineEventHandler(async (event) => {
     console.log("Table service_themes non encore créée");
   }
 
+  // 4. Fetch formations
+  let formations: any[] = [];
+  try {
+    const formationRes = await db.execute({
+      sql: 'SELECT * FROM service_formations WHERE service_id = ?',
+      args: [Number(id)]
+    });
+    formations = formationRes.rows.map(r => ({ ...r, id: Number(r.id) }));
+  } catch (e) {
+    console.log("Table service_formations non encore créée");
+  }
+
   // Construct response gracefully forcing Num types
   const service = {
     ...serviceRes,
     id: Number(serviceRes.id),
     category_ids,
     categories,
-    themes
+    themes,
+    formations
   };
   
   return service;

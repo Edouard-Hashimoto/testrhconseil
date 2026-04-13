@@ -30,9 +30,28 @@ export default defineEventHandler(async () => {
         objectives: row.objectives
       });
     }
+
+    // Requête 4 : Obtenir les formations
+    const formationsMap: Record<string, any[]> = {};
+    const formations = await db.execute('SELECT * FROM service_formations ORDER BY id ASC');
+    for (const row of formations.rows) {
+      const sId = String(row.service_id);
+      if (!formationsMap[sId]) formationsMap[sId] = [];
+      formationsMap[sId].push({
+        id: Number(row.id),
+        title: row.title,
+        objectives: row.objectives
+      });
+    }
+
+    // On stocke formationsMap dans une variable accessible pour le map final
+    (globalThis as any)._tempFormationsMap = formationsMap;
+
   } catch (e) {
-    console.log("Erreur lors du chargement des relations (categories/themes).");
+    console.log("Erreur lors du chargement des relations (categories/themes/formations).");
   }
+
+  const formationsMap = (globalThis as any)._tempFormationsMap || {};
 
   // Combiner les résultats
   return res.rows.map((s: any) => {
@@ -44,7 +63,8 @@ export default defineEventHandler(async () => {
       ...s,
       id: Number(s.id),
       category_ids: mapArray && mapArray.length > 0 ? mapArray : fallbackArray,
-      themes: themesMap[sId] || []
+      themes: themesMap[sId] || [],
+      formations: formationsMap[sId] || []
     };
   });
 });

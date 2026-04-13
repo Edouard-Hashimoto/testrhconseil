@@ -8,7 +8,7 @@ const refresh = async () => {
   await refreshServices()
 }
 
-const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [], themes: [] })
+const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [] })
 const editingId = ref(null)
 const editData = ref({})
 const uploading = ref(false)
@@ -49,11 +49,16 @@ const createService = async (evt) => {
       objectives: Array.isArray(t.objectives) ? t.objectives.filter(o => o.trim()).join('\n') : t.objectives
     }))
     
+    const formationsToSave = (newService.value.formations || []).map(f => ({
+      ...f,
+      objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+    }))
+    
     await $fetch('/api/services', { 
       method: 'POST', 
-      body: { ...newService.value, logo, themes: themesToSave } 
+      body: { ...newService.value, logo, themes: themesToSave, formations: formationsToSave } 
     })
-    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [], themes: [] }
+    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [] }
     if (fileInput) fileInput.value = ''
     await refresh()
   } catch (e) {
@@ -71,6 +76,10 @@ const startEdit = (service) => {
     themes: service.themes ? service.themes.map(t => ({
       ...t,
       objectives: t.objectives ? t.objectives.split('\n').filter(o => o.trim()) : ['']
+    })) : [],
+    formations: service.formations ? service.formations.map(f => ({
+      ...f,
+      objectives: f.objectives ? f.objectives.split('\n').filter(o => o.trim()) : ['']
     })) : []
   }
 }
@@ -84,6 +93,17 @@ const addTheme = (target) => {
 const removeTheme = (target, index) => {
   const data = target.value || target
   data.themes.splice(index, 1)
+}
+
+const addFormation = (target) => {
+  const data = target.value || target
+  if (!data.formations) data.formations = []
+  data.formations.push({ title: '', objectives: [''] })
+}
+
+const removeFormation = (target, index) => {
+  const data = target.value || target
+  data.formations.splice(index, 1)
 }
 
 const addObjective = (theme) => {
@@ -108,10 +128,15 @@ const saveEdit = async (evt) => {
       ...t,
       objectives: Array.isArray(t.objectives) ? t.objectives.filter(o => o.trim()).join('\n') : t.objectives
     }))
+
+    const formationsToSave = editData.value.formations.map(f => ({
+      ...f,
+      objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+    }))
     
     await $fetch('/api/services', { 
       method: 'PUT', 
-      body: { ...editData.value, logo, themes: themesToSave } 
+      body: { ...editData.value, logo, themes: themesToSave, formations: formationsToSave } 
     })
     editingId.value = null
     await refresh()
@@ -260,6 +285,30 @@ const deleteService = async (id) => {
               </div>
             </div>
           </div>
+
+          <div class="field basis-full" style="border-top: 1px dashed #e2e8f0; padding-top: 1.5rem;">
+            <div class="themes-header">
+              <label>Formations & Objectifs</label>
+              <button type="button" @click="addFormation(newService)" class="btn-add-mini">+ Ajouter une formation</button>
+            </div>
+            <div class="themes-list">
+              <div v-for="(form, idx) in newService.formations" :key="idx" class="theme-item-edit" style="border-left: 4px solid #F7A600;">
+                <div class="theme-row-top">
+                  <input v-model="form.title" type="text" placeholder="Titre de la formation..." class="grow" />
+                  <button type="button" @click="removeFormation(newService, idx)" class="btn-remove-mini">×</button>
+                </div>
+                
+                <div class="objectives-edit-section">
+                  <span class="label-tiny">Objectifs pédagogiques</span>
+                  <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="objective-field-row">
+                    <input v-model="form.objectives[oIdx]" type="text" placeholder="Saisir un objectif..." class="grow" />
+                    <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
+                  </div>
+                  <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain">+ Ajouter un objectif</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="field" style="padding-top: 0.5rem; width: 100%; display: flex; justify-content: flex-end;">
             <button type="submit" :disabled="saving || uploading" class="btn-primary">
               <span v-if="saving || uploading" class="spinner-sm"></span>
@@ -324,6 +373,27 @@ const deleteService = async (id) => {
                              <button type="button" @click="removeObjective(theme, oIdx)" class="btn-remove-tiny">×</button>
                            </div>
                            <button type="button" @click="addObjective(theme)" class="btn-add-tiny-plain" style="font-size: 0.6rem;">+ Obj.</button>
+                         </div>
+                      </div>
+                    </div>
+
+                    <div class="themes-edit-wrap" style="border-top: 1px dashed #e2e8f0; margin-top: 1rem; padding-top: 1rem;">
+                      <div class="themes-header-mini">
+                        <span class="label-mini" style="color: #F7A600;">Formations</span>
+                        <button type="button" @click="addFormation(editData)" class="btn-add-mini-plain" style="color: #F7A600;">+ Ajouter</button>
+                      </div>
+                      <div v-for="(form, idx) in editData.formations" :key="idx" class="theme-item-mini" style="border-left: 2px solid #F7A600;">
+                         <div class="theme-mini-row">
+                           <input v-model="form.title" placeholder="Formation" class="mini-input grow" style="font-weight: bold;" />
+                           <button type="button" @click="removeFormation(editData, idx)" class="btn-remove-mini">×</button>
+                         </div>
+                         
+                         <div class="mini-objectives">
+                           <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="mini-objective-row">
+                             <input v-model="form.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
+                             <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
+                           </div>
+                           <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain" style="font-size: 0.6rem; color: #F7A600;">+ Obj.</button>
                          </div>
                       </div>
                     </div>

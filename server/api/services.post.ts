@@ -55,5 +55,21 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 4. Insertion des formations
+  if (body.formations && Array.isArray(body.formations)) {
+    try {
+      for (const form of body.formations) {
+        if (form.title && form.objectives) {
+          await db.execute({
+            sql: 'INSERT INTO service_formations (service_id, title, objectives) VALUES (?, ?, ?)',
+            args: [Number(serviceId), form.title, form.objectives]
+          });
+        }
+      }
+    } catch (e: any) {
+      console.error('Erreur insertion service_formations:', e.message);
+    }
+  }
+
   return { id: serviceId?.toString(), ...body };
 });

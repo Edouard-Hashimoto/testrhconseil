@@ -15,6 +15,11 @@ const openThemeId = ref(null)
 const toggleTheme = (id) => {
   openThemeId.value = openThemeId.value === id ? null : id
 }
+
+const openFormationId = ref(null)
+const toggleFormation = (id) => {
+  openFormationId.value = openFormationId.value === id ? null : id
+}
 </script>
 
 <template>
@@ -71,6 +76,36 @@ const toggleTheme = (id) => {
                       {{ line }}
                     </li>
                   </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accordion Formations -->
+          <div v-if="service.formations && service.formations.length > 0" class="formations-section">
+            <h2 class="section-title mt-12">Nos formations</h2>
+            <div class="themes-accordion">
+              <div 
+                v-for="form in service.formations" 
+                :key="form.id" 
+                class="theme-card formation-card"
+                :class="{ 'is-open': openFormationId === form.id }"
+              >
+                <button class="theme-header" @click="toggleFormation(form.id)">
+                  <span class="theme-title">{{ form.title }}</span>
+                  <span class="theme-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                  </span>
+                </button>
+                <div class="theme-body">
+                  <div class="theme-body-inner">
+                    <div class="objectives-label" style="color: #F7A600;">Objectifs pédagogiques</div>
+                    <ul class="objectives-list">
+                      <li v-for="(line, lidx) in form.objectives.split('\n').filter(l => l.trim())" :key="lidx" class="li-formation">
+                        {{ line }}
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -431,5 +466,20 @@ const toggleTheme = (id) => {
   left: 0;
   color: #e91e8c;
   font-weight: bold;
+}
+
+.mt-12 { margin-top: 3rem; }
+.formations-section { margin-top: 3.5rem; }
+
+.formation-card.is-open {
+  border-color: #F7A600;
+}
+
+.formation-card.is-open .theme-icon {
+  background: #F7A600;
+}
+
+.li-formation::before {
+  color: #F7A600 !important;
 }
 </style>

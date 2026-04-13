@@ -62,5 +62,25 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 4. Mise à jour des formations
+  if (body.formations && Array.isArray(body.formations)) {
+    try {
+      await db.execute({
+        sql: 'DELETE FROM service_formations WHERE service_id = ?',
+        args: [Number(serviceId)]
+      });
+      for (const form of body.formations) {
+        if (form.title && form.objectives) {
+          await db.execute({
+            sql: 'INSERT INTO service_formations (service_id, title, objectives) VALUES (?, ?, ?)',
+            args: [Number(serviceId), form.title, form.objectives]
+          });
+        }
+      }
+    } catch (e: any) {
+      console.error('Erreur update service_formations:', e.message);
+    }
+  }
+
   return { success: true };
 });

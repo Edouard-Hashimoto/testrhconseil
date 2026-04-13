@@ -110,6 +110,13 @@ export const initDb = async () => {
       title TEXT NOT NULL,
       objectives TEXT NOT NULL,
       FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS service_formations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      service_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      objectives TEXT NOT NULL,
+      FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
     )`
   ], "write");
 
