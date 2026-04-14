@@ -181,7 +181,7 @@ useHead({
   font-size: 1.1rem;
   line-height: 1.8;
   color: #334155;
-  text-align: justify;
+  text-align: left; /* Meilleur pour le mobile que 'justify' */
 }
 
 .description-text p {
@@ -249,18 +249,48 @@ useHead({
 }
 
 @media (max-width: 600px) {
+  .service-detail-page {
+    padding: 60px 0.75rem 4rem;
+  }
+
   .service-card-hero {
-    padding: 3rem 1.5rem;
+    padding: 2.5rem 1.25rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
   }
   
   .hero-content {
-    flex-direction: column-reverse;
+    flex-direction: column;
     text-align: center;
+  }
+
+  .service-title {
+    font-size: 1.8rem;
+  }
+
+  .service-subtitle {
+    font-size: 1.1rem;
   }
   
   .service-logo {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+
+  .description-text {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .breadcrumb {
+    font-size: 0.8rem;
+    display: flex;
+    flex-wrap: wrap;
   }
 }
 </style>

@@ -195,7 +195,31 @@ useHead({
 }
 
 .member-card {
-  background: linear-gradient(135deg, rgba(200, 212, 0, 0.45) 0%, rgba(163, 21, 68, 0.45) 100%);
+  background-color: #fff;
+  background-image: repeating-linear-gradient(
+    90deg, 
+    /* Groupe Vert */
+    rgba(200, 212, 0, 0.41) 0px, rgba(200, 212, 0, 0.41) 6px,
+    transparent 6px, transparent 12px,
+    rgba(200, 212, 0, 0.41) 12px, rgba(200, 212, 0, 0.41) 18px,
+    transparent 18px, transparent 24px,
+    rgba(200, 212, 0, 0.41) 24px, rgba(200, 212, 0, 0.41) 30px,
+    transparent 30px, transparent 60px, /* Grand espace */
+    /* Groupe Bleu */
+    rgba(66, 185, 181, 0.41) 60px, rgba(66, 185, 181, 0.41) 66px,
+    transparent 66px, transparent 72px,
+    rgba(66, 185, 181, 0.41) 72px, rgba(66, 185, 181, 0.41) 78px,
+    transparent 78px, transparent 84px,
+    rgba(66, 185, 181, 0.41) 84px, rgba(66, 185, 181, 0.41) 90px,
+    transparent 90px, transparent 120px, /* Grand espace */
+    /* Groupe Rose */
+    rgba(186, 15, 96, 0.41) 120px, rgba(186, 15, 96, 0.41) 126px,
+    transparent 126px, transparent 132px,
+    rgba(186, 15, 96, 0.41) 132px, rgba(186, 15, 96, 0.41) 138px,
+    transparent 138px, transparent 144px,
+    rgba(186, 15, 96, 0.41) 144px, rgba(186, 15, 96, 0.41) 150px,
+    transparent 150px, transparent 180px /* Grand espace */
+  );
   border-radius: 24px;
   padding: 3rem 1.5rem;
   display: flex;
@@ -205,7 +229,7 @@ useHead({
   transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid #eee;
   height: 100%;
   text-decoration: none;
   color: inherit;
@@ -242,23 +266,33 @@ useHead({
 .member-info {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.85); /* Fond blanc translucide */
+  backdrop-filter: blur(8px); /* Flou artistique derrière le texte */
+  padding: 1.5rem 1rem;
+  border-radius: 18px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  z-index: 1;
 }
 
 .member-name {
-  font-size: 1.55rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  color: #222;
+  color: #1a1a2e;
   margin: 0;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 
 .member-role {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #444;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4b5563;
   margin: 0;
   line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .building-section {

@@ -149,4 +149,24 @@ useHead({
     height: 70px;
   }
 }
+
+@media (max-width: 600px) {
+  .particuliers-page {
+    padding: 3rem 1.25rem;
+  }
+
+  .service-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+
+  .page-title {
+    margin-bottom: 1.5rem;
+  }
+
+  .page-desc {
+    font-size: 1rem;
+  }
+}
 </style>

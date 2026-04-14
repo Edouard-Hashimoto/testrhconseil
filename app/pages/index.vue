@@ -203,7 +203,7 @@ onMounted(() => {
 }
 
 .hero-text {
-  flex: 0 0 36%;
+  flex: 0 0 50%;
   padding: 3.5rem 2.5rem 3.5rem 3rem;
 }
 
@@ -220,18 +220,20 @@ onMounted(() => {
 
 
 .hero-img {
-  flex: 0 0 64%;
+  flex: 0 0 50%;
   align-self: stretch;
   overflow: hidden;
   padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero-img img {
-  width: 100%;
-  height: 100%;
-  min-height: 300px;
-  object-fit: cover;
-  object-position: left center;
+  width: 85%;
+  height: auto;
+  min-height: auto;
+  object-fit: contain;
 }
 
 
