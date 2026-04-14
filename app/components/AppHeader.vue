@@ -29,7 +29,7 @@
         </ul>
       </nav>
 
-      <button class="burger" @click="menuOpen = !menuOpen" aria-label="Ouvrir le menu">
+      <button class="burger" :class="{ 'active': menuOpen }" @click="menuOpen = !menuOpen" aria-label="Menu">
         <span></span>
         <span></span>
         <span></span>
@@ -247,24 +247,38 @@ const { data: services } = await useFetch('/api/services')
 
 .burger span {
   display: block;
-  width: 24px;
+  width: 26px;
   height: 2px;
   background-color: #2d3748;
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center right;
+}
+
+.burger.active span:nth-child(1) {
+  transform: rotate(-45deg);
+}
+
+.burger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.burger.active span:nth-child(3) {
+  transform: rotate(45deg);
 }
 
 .mobile-nav {
   display: none;
   background: #ffffff;
   border-top: 1px solid #e8e8e8;
-  overflow: hidden;
+  overflow-y: auto;
   max-height: 0;
-  transition: max-height 0.3s ease;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-nav.open {
-  max-height: 400px;
+  max-height: 85vh; /* Largement assez pour tout voir */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-nav-list {

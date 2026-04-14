@@ -306,7 +306,7 @@ useHead({
   padding: 0 4rem;
   display: flex;
   align-items: center;
-  gap: 8rem;
+  gap: 4rem;
 }
 
 .building-text {
@@ -326,31 +326,30 @@ useHead({
 }
 
 .building-img-wrap {
-  flex: 0 0 350px;
+  flex: 1.2; /* Donne plus de place à l'image */
   display: flex;
   justify-content: center;
 }
 
 .circle-border {
   width: 100%;
-  max-width: 330px;
-  aspect-ratio: 1/1;
-  border-radius: 50%;
-  padding: 10px;
-  border: 4px solid #42B9B5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  max-width: 500px;
+  aspect-ratio: 16/10;
+  border-radius: 40px;
   overflow: hidden;
-  background-color: #fff;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  display: flex;
+  border: 4px solid #42B9B5;
+  padding: 12px;
+  background-color: transparent;
 }
 
 .building-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
+  object-position: center center;
+  border-radius: 30px; /* On arrondit aussi l'image pour suivre le cadre */
 }
 
 @media (max-width: 1000px) {
@@ -389,7 +388,8 @@ useHead({
   }
   
   .circle-border {
-    max-width: 320px;
+    max-width: 100%;
+    aspect-ratio: 16/9;
   }
 
   .building-text p {
