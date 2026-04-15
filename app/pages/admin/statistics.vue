@@ -182,7 +182,7 @@ const handleLogout = async () => {
           </div>
           <div class="field span-full">
             <label>Texte / Valeurs</label>
-            <textarea v-model="(editingId ? editData : newStat).text" rows="3" placeholder="Description des statistiques..."></textarea>
+            <RichEditor v-model="(editingId ? editData : newStat).text" />
           </div>
           <div class="span-full">
             <button type="submit" :disabled="isSending" class="btn-primary">
@@ -205,11 +205,11 @@ const handleLogout = async () => {
         <div v-else class="list-container">
           <div v-for="item in statistics" :key="item.id" class="list-item">
             <div class="item-img" v-if="item.image">
-              <img :src="`/uploads/stats/${item.image}`" alt="Stat" />
+              <img :src="useAssetUrl(item.image, 'stats')" alt="Stat" />
             </div>
             <div class="item-info">
               <p class="item-title">{{ item.title }}</p>
-              <p class="item-text">{{ item.text }}</p>
+              <p class="item-text" v-html="item.text"></p>
             </div>
             <div class="item-actions">
               <button @click="startEdit(item)" class="btn-edit-tool" title="Modifier">
@@ -263,16 +263,17 @@ const handleLogout = async () => {
 .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .list-container { display: flex; flex-direction: column; gap: 0.75rem; }
-.list-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
-.item-img { width: 60px; height: 60px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
-.item-img img { width: 100%; height: 100%; object-fit: cover; }
+.list-item { display: flex; align-items: center; gap: 1.25rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
+.item-img { width: 80px; height: 80px; border-radius: 10px; overflow: hidden; flex-shrink: 0; border: 1px solid #e2e8f0; background: #fff; display: flex; align-items: center; justify-content: center; }
+.item-img img { width: 100%; height: 100%; object-fit: contain; }
 .item-info { flex: 1; min-width: 0; }
-.item-title { font-weight: 700; color: #1e293b; margin: 0 0 0.2rem; }
-.item-text { font-size: 0.85rem; color: #64748b; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-title { font-weight: 700; color: #1e293b; margin: 0 0 0.3rem; font-size: 1.05rem; }
+.item-text { font-size: 0.875rem; color: #64748b; margin: 0; line-height: 1.5; max-height: 3.6em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; }
+.item-text :deep(p) { margin: 0; }
 .item-actions { display: flex; gap: 0.5rem; }
-.btn-edit-tool { padding: 0.4rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #2563eb; cursor: pointer; }
+.btn-edit-tool { padding: 0.5rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #2563eb; cursor: pointer; transition: all 0.2s; }
 .btn-edit-tool:hover { background: #dbeafe; }
-.btn-delete { padding: 0.4rem; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; cursor: pointer; }
+.btn-delete { padding: 0.5rem; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; color: #ef4444; cursor: pointer; transition: all 0.2s; }
 .btn-delete:hover { background: #fee2e2; }
 .btn-cancel { background: none; border: none; color: #94a3b8; font-weight: 600; cursor: pointer; }
 .empty-state { padding: 3rem; text-align: center; color: #94a3b8; font-size: 0.9rem; }

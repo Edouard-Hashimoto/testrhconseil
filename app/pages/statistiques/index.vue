@@ -30,7 +30,7 @@ useHead({
             </div>
             <div class="stat-content">
               <h2 class="stat-title">{{ stat.title }}</h2>
-              <div class="stat-text" v-html="stat.text.replace(/\n/g, '<br/>')"></div>
+              <div class="stat-text" v-html="stat.text"></div>
             </div>
           </div>
         </div>
@@ -165,6 +165,13 @@ useHead({
   color: #444;
   line-height: 1.6;
 }
+
+.stat-text :deep(p) { margin-bottom: 1rem; }
+.stat-text :deep(p:last-child) { margin-bottom: 0; }
+.stat-text :deep(strong) { font-weight: 800; color: #1e293b; }
+.stat-text :deep(ul) { list-style: disc; padding-left: 1.5rem; margin: 1rem 0; }
+.stat-text :deep(li) { margin-bottom: 0.5rem; }
+.stat-text :deep(a) { color: #e91e8c; text-decoration: underline; }
 
 @media (max-width: 768px) {
   .hero-content {
