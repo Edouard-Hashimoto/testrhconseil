@@ -72,8 +72,8 @@ export default defineEventHandler(async (event) => {
       for (const form of body.formations) {
         if (form.title && form.objectives) {
           await db.execute({
-            sql: 'INSERT INTO service_formations (service_id, title, objectives) VALUES (?, ?, ?)',
-            args: [Number(serviceId), form.title, form.objectives]
+            sql: 'INSERT INTO service_formations (service_id, title, objectives, date, pdf_url) VALUES (?, ?, ?, ?, ?)',
+            args: [Number(serviceId), form.title, form.objectives, form.date || null, form.pdf_url || null]
           });
         }
       }

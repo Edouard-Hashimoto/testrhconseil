@@ -40,7 +40,9 @@ export default defineEventHandler(async () => {
       formationsMap[sId].push({
         id: Number(row.id),
         title: row.title,
-        objectives: row.objectives
+        objectives: row.objectives,
+        date: row.date,
+        pdf_url: row.pdf_url
       });
     }
 

@@ -4,6 +4,13 @@ definePageMeta({ middleware: 'auth' })
 const { data: services, refresh: refreshServices } = await useFetch('/api/services')
 const { data: categories } = await useFetch('/api/categories')
 
+onMounted(async () => {
+  if (services.value?.length === 0) await refresh()
+  try {
+    await $fetch('/api/admin/fix-db')
+  } catch (e) {}
+})
+
 const refresh = async () => {
   await refreshServices()
 }
@@ -36,6 +43,19 @@ const uploadLogo = async (file) => {
   }
 }
 
+const uploadPdf = async (file) => {
+  if (!file) return null
+  uploading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await $fetch('/api/upload-pdf', { method: 'POST', body: form })
+    return res.url
+  } finally {
+    uploading.value = false
+  }
+}
+
 const createService = async (evt) => {
   const fileInput = evt.target.closest('form').querySelector('input[type="file"]')
   const file = fileInput?.files?.[0]
@@ -49,9 +69,14 @@ const createService = async (evt) => {
       objectives: Array.isArray(t.objectives) ? t.objectives.filter(o => o.trim()).join('\n') : t.objectives
     }))
     
-    const formationsToSave = (newService.value.formations || []).map(f => ({
-      ...f,
-      objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+    const formationsToSave = await Promise.all((newService.value.formations || []).map(async f => {
+      let pdf_url = f.pdf_url
+      if (f._pdfFile) pdf_url = await uploadPdf(f._pdfFile)
+      return {
+        ...f,
+        pdf_url,
+        objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+      }
     }))
     
     await $fetch('/api/services', { 
@@ -79,6 +104,9 @@ const startEdit = (service) => {
     })) : [],
     formations: service.formations ? service.formations.map(f => ({
       ...f,
+      date: f.date || '',
+      pdf_url: f.pdf_url || '',
+      _pdfFile: null,
       objectives: f.objectives ? f.objectives.split('\n').filter(o => o.trim()) : ['']
     })) : []
   }
@@ -96,13 +124,40 @@ const removeTheme = (target, index) => {
 }
 
 const addFormation = (target) => {
-  const data = target.value || target
+  const data = (target && target.value) ? target.value : target
   if (!data.formations) data.formations = []
-  data.formations.push({ title: '', objectives: [''] })
+  data.formations.push({ 
+    title: '', 
+    objectives: [''], 
+    date: '', 
+    pdf_url: '', 
+    _pdfFile: null 
+  })
+}
+
+const migrateThemesToFormations = (target) => {
+  const data = (target && target.value) ? target.value : target
+  if (!data.themes || data.themes.length === 0) {
+    alert("Aucune thématique à migrer")
+    return
+  }
+  if (!data.formations) data.formations = []
+  
+  const today = new Date().toISOString().split('T')[0]
+  
+  const migrated = data.themes.map(t => ({
+    title: t.title,
+    objectives: [...t.objectives],
+    date: today,
+    pdf_url: '',
+    _pdfFile: null
+  }))
+  
+  data.formations = [...data.formations, ...migrated]
 }
 
 const removeFormation = (target, index) => {
-  const data = target.value || target
+  const data = (target && target.value) ? target.value : target
   data.formations.splice(index, 1)
 }
 
@@ -129,9 +184,17 @@ const saveEdit = async (evt) => {
       objectives: Array.isArray(t.objectives) ? t.objectives.filter(o => o.trim()).join('\n') : t.objectives
     }))
 
-    const formationsToSave = editData.value.formations.map(f => ({
-      ...f,
-      objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+    const formationsToSave = await Promise.all(editData.value.formations.map(async f => {
+      let currentPdf = f.pdf_url
+      if (f._pdfFile) {
+        const uploaded = await uploadPdf(f._pdfFile)
+        if (uploaded) currentPdf = uploaded
+      }
+      return {
+        ...f,
+        pdf_url: currentPdf,
+        objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+      }
     }))
     
     await $fetch('/api/services', { 
@@ -289,15 +352,32 @@ const deleteService = async (id) => {
           <div class="field basis-full" style="border-top: 1px dashed #e2e8f0; padding-top: 1.5rem;">
             <div class="themes-header">
               <label>Formations & Objectifs</label>
-              <button type="button" @click="addFormation(newService)" class="btn-add-mini">+ Ajouter une formation</button>
+              <div class="header-btns">
+                <button type="button" @click="migrateThemesToFormations(newService)" class="btn-migrate-mini" v-if="newService.themes?.length > 0">Copier les thématiques</button>
+                <button type="button" @click="addFormation(newService)" class="btn-add-mini">+ Ajouter une formation</button>
+              </div>
             </div>
             <div class="themes-list">
-              <div v-for="(form, idx) in newService.formations" :key="idx" class="theme-item-edit" style="border-left: 4px solid #F7A600;">
+              <div v-for="(form, idx) in newService.formations" :key="idx" class="theme-item-edit-large" style="border-left: 4px solid #F7A600;">
                 <div class="theme-row-top">
                   <input v-model="form.title" type="text" placeholder="Titre de la formation..." class="grow" />
                   <button type="button" @click="removeFormation(newService, idx)" class="btn-remove-mini">×</button>
                 </div>
                 
+                <div class="formation-meta-edit">
+                  <div class="field">
+                    <label class="label-tiny">Date de la formation</label>
+                    <input v-model="form.date" type="date" />
+                  </div>
+                  <div class="field">
+                    <label class="label-tiny">Document PDF</label>
+                    <div class="pdf-upload-box">
+                      <input type="file" @change="e => form._pdfFile = e.target.files[0]" accept="application/pdf" class="file-input-sm" />
+                      <span v-if="form.pdf_url" class="pdf-status">✓ En ligne</span>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="objectives-edit-section">
                   <span class="label-tiny">Objectifs pédagogiques</span>
                   <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="objective-field-row">
@@ -343,70 +423,113 @@ const deleteService = async (id) => {
             <tbody>
               <tr v-for="service in services" :key="service.id">
                 <template v-if="editingId === service.id">
-                  <td><input v-model="editData.color" type="color" class="color-pick-small" /></td>
-                  <td>
-                    <div class="checkbox-grid-mini">
-                      <label v-for="cat in categories" :key="cat.id" class="checkbox-item-mini">
-                        <input type="checkbox" :value="Number(cat.id)" v-model="editData.category_ids" />
-                        <span>{{ cat.titre }}</span>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <input v-model="editData.title" class="edit-input mb-2" style="width: 100%; font-weight: bold;" />
-                    <textarea v-model="editData.description" class="edit-input mb-2" style="width: 100%; font-size: 0.8rem;" rows="1" placeholder="Intro..."></textarea>
-                    
-                    <div class="themes-edit-wrap">
-                      <div class="themes-header-mini">
-                        <span class="label-mini">Thématiques</span>
-                        <button type="button" @click="addTheme(editData)" class="btn-add-mini-plain">+ Ajouter</button>
+                  <td colspan="5" class="edit-mode-cell">
+                    <div class="edit-full-layout">
+                      <!-- Barre latérale / Catégories -->
+                      <div class="edit-sidebar">
+                        <div class="field">
+                          <label>Couleur</label>
+                          <input v-model="editData.color" type="color" class="color-pick-small" />
+                        </div>
+                        <div class="field mt-4">
+                          <label>Catégories</label>
+                          <div class="checkbox-grid-mini">
+                            <label v-for="cat in categories" :key="cat.id" class="checkbox-item-mini">
+                              <input type="checkbox" :value="Number(cat.id)" v-model="editData.category_ids" />
+                              <span>{{ cat.titre }}</span>
+                            </label>
+                          </div>
+                        </div>
+                        <div class="field mt-4">
+                          <label>Logo du service</label>
+                          <div class="logo-edit">
+                            <img v-if="editData.logo" :src="useAssetUrl(editData.logo, 'logo')" class="logo-thumb" />
+                            <input type="file" accept="image/*" class="file-input-sm" />
+                          </div>
+                        </div>
+                        
+                        <div class="edit-actions-sidebar mt-8">
+                          <button @click="saveEdit($event)" :disabled="saving" class="btn-save-full">Enregistrer les modifications</button>
+                          <button @click="editingId = null" class="btn-cancel-full">Annuler</button>
+                        </div>
                       </div>
-                      <div v-for="(theme, idx) in editData.themes" :key="idx" class="theme-item-mini">
-                         <div class="theme-mini-row">
-                           <input v-model="theme.title" placeholder="Thème" class="mini-input grow" style="font-weight: bold;" />
-                           <button type="button" @click="removeTheme(editData, idx)" class="btn-remove-mini">×</button>
-                         </div>
-                         
-                         <div class="mini-objectives">
-                           <div v-for="(obj, oIdx) in theme.objectives" :key="oIdx" class="mini-objective-row">
-                             <input v-model="theme.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
-                             <button type="button" @click="removeObjective(theme, oIdx)" class="btn-remove-tiny">×</button>
-                           </div>
-                           <button type="button" @click="addObjective(theme)" class="btn-add-tiny-plain" style="font-size: 0.6rem;">+ Obj.</button>
-                         </div>
-                      </div>
-                    </div>
 
-                    <div class="themes-edit-wrap" style="border-top: 1px dashed #e2e8f0; margin-top: 1rem; padding-top: 1rem;">
-                      <div class="themes-header-mini">
-                        <span class="label-mini" style="color: #F7A600;">Formations</span>
-                        <button type="button" @click="addFormation(editData)" class="btn-add-mini-plain" style="color: #F7A600;">+ Ajouter</button>
-                      </div>
-                      <div v-for="(form, idx) in editData.formations" :key="idx" class="theme-item-mini" style="border-left: 2px solid #F7A600;">
-                         <div class="theme-mini-row">
-                           <input v-model="form.title" placeholder="Formation" class="mini-input grow" style="font-weight: bold;" />
-                           <button type="button" @click="removeFormation(editData, idx)" class="btn-remove-mini">×</button>
-                         </div>
-                         
-                         <div class="mini-objectives">
-                           <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="mini-objective-row">
-                             <input v-model="form.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
-                             <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
-                           </div>
-                           <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain" style="font-size: 0.6rem; color: #F7A600;">+ Obj.</button>
-                         </div>
+                      <!-- Contenu principal -->
+                      <div class="edit-main-fields">
+                        <div class="field mb-4">
+                          <label>Titre du service</label>
+                          <input v-model="editData.title" class="edit-input-lg" placeholder="ex: Formations" />
+                        </div>
+                        <div class="field mb-6">
+                          <label>Introduction du service</label>
+                          <textarea v-model="editData.description" class="edit-input" rows="3" placeholder="Présentation rapide du service..."></textarea>
+                        </div>
+
+                        <div class="edit-sections-grid">
+                          <!-- Thématiques -->
+                          <div class="edit-section-block">
+                            <div class="themes-header-mini mb-4">
+                              <span class="label-mini">Thématiques & Accompagnement</span>
+                              <button type="button" @click="addTheme(editData)" class="btn-add-mini-plain">+ Ajouter un thème</button>
+                            </div>
+                            <div class="themes-list-scroll">
+                              <div v-for="(theme, idx) in editData.themes" :key="idx" class="theme-item-mini-v2">
+                                <div class="theme-mini-row">
+                                  <input v-model="theme.title" placeholder="Titre du thème" class="mini-input grow" style="font-weight: 700;" />
+                                  <button type="button" @click="removeTheme(editData, idx)" class="btn-remove-mini">×</button>
+                                </div>
+                                <div class="mini-objectives">
+                                  <div v-for="(obj, oIdx) in theme.objectives" :key="oIdx" class="mini-objective-row">
+                                    <input v-model="theme.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
+                                    <button type="button" @click="removeObjective(theme, oIdx)" class="btn-remove-tiny">×</button>
+                                  </div>
+                                  <button type="button" @click="addObjective(theme)" class="btn-add-tiny-plain">+ Obj.</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Formations -->
+                          <div class="edit-section-block">
+                            <div class="themes-header-mini mb-4">
+                              <span class="label-mini" style="color: #F7A600;">Catalogue Formations (Calendrier)</span>
+                              <div class="mini-header-btns">
+                                <button type="button" @click="migrateThemesToFormations(editData)" class="btn-migrate-mini-plain" v-if="editData.themes?.length > 0">Copier les thèmes</button>
+                                <button type="button" @click="addFormation(editData)" class="btn-add-mini-plain" style="color: #F7A600;">+ Ajouter une formation</button>
+                              </div>
+                            </div>
+                            <div class="themes-list-scroll">
+                              <div v-for="(form, idx) in editData.formations" :key="idx" class="theme-item-mini-v2" style="border-left-color: #F7A600;">
+                                <div class="theme-mini-row">
+                                  <input v-model="form.title" placeholder="Nom de la formation" class="mini-input grow" style="font-weight: 700;" />
+                                  <button type="button" @click="removeFormation(editData, idx)" class="btn-remove-mini">×</button>
+                                </div>
+                                <div class="formation-meta-edit-mini-v2">
+                                  <div class="field">
+                                    <span class="label-tiny">Date (Calendrier)</span>
+                                    <input v-model="form.date" type="date" class="mini-input-date" />
+                                  </div>
+                                  <div class="field">
+                                    <span class="label-tiny">Programme PDF</span>
+                                    <div class="mini-pdf-row">
+                                      <input type="file" @change="e => form._pdfFile = e.target.files[0]" accept="application/pdf" class="file-input-xs" />
+                                      <span v-if="form.pdf_url" class="pdf-tag">OK</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="mini-objectives">
+                                  <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="mini-objective-row">
+                                    <input v-model="form.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
+                                    <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
+                                  </div>
+                                  <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain" style="color: #F7A600;">+ Obj.</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </td>
-                  <td>
-                    <div class="logo-edit">
-                      <img v-if="editData.logo" :src="useAssetUrl(editData.logo, 'logo')" class="logo-thumb" />
-                      <input type="file" accept="image/*" class="file-input-sm" />
-                    </div>
-                  </td>
-                  <td class="text-right">
-                    <button @click="saveEdit($event)" :disabled="saving" class="btn-save">Enregistrer</button>
-                    <button @click="editingId = null" class="btn-cancel">Annuler</button>
                   </td>
                 </template>
                 <template v-else>
@@ -486,7 +609,7 @@ const deleteService = async (id) => {
 .nav-item { display: flex; align-items: center; gap: 0.55rem; padding: 0.55rem 0.8rem; border-radius: 7px; font-size: 0.82rem; font-weight: 500; color: rgba(255,255,255,0.5); transition: all 0.2s; text-decoration: none; }
 .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
 .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
-.nav-item.active { background: rgba(233,30,140,0.2); color: #f472b6; }
+.nav-item.active { background: rgba(66, 185, 181, 0.2); color: #42b9b5; }
 .logout-btn { background: none; border: none; cursor: pointer; width: 100%; text-align: left; color: rgba(255,100,100,0.65); }
 .logout-btn:hover { background: rgba(239,68,68,0.12); color: #f87171; }
 .sidebar-logout { margin-top: auto; display: flex; align-items: center; gap: 0.6rem; padding: 0.8rem 1rem; border-top: 1px solid rgba(255,255,255,0.08); background: none; border-left: none; border-right: none; border-bottom: none; color: rgba(255,255,255,0.45); font-size: 0.82rem; cursor: pointer; transition: color 0.2s; width: 100%; }
@@ -601,4 +724,29 @@ const deleteService = async (id) => {
 .btn-add-tiny-plain { font-size: 0.75rem; font-weight: 800; color: #e91e8c; background: #fff; border: 1px solid rgba(233, 30, 140, 0.2); border-radius: 6px; padding: 0.3rem 0.8rem; cursor: pointer; margin-top: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .mini-objectives { padding-left: 0.75rem; border-left: 3px solid #e2e8f0; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .mini-objective-row { display: flex; gap: 0.35rem; align-items: center; }
+.formation-meta-edit { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem; }
+.pdf-upload-box { display: flex; align-items: center; gap: 0.5rem; }
+.pdf-status { font-size: 0.7rem; color: #16a34a; font-weight: 700; white-space: nowrap; }
+.formation-meta-edit-mini { background: #fff; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.edit-mode-cell { background: #f0f7f7; padding: 0 !important; }
+.edit-full-layout { display: flex; gap: 0; min-height: 500px; border: 2px solid #42b9b5; border-radius: 12px; overflow: hidden; }
+.edit-sidebar { width: 260px; background: #fff; padding: 2rem; border-right: 1px solid #e2e8f0; }
+.edit-main-fields { flex: 1; padding: 2rem; display: flex; flex-direction: column; }
+.edit-input-lg { width: 100%; padding: 0.8rem 1rem; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1.1rem; font-weight: 700; outline: none; transition: border-color 0.2s; }
+.edit-input-lg:focus { border-color: #42b9b5; }
+.edit-sections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem; flex: 1; }
+.edit-section-block { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; display: flex; flex-direction: column; }
+.themes-list-scroll { flex: 1; overflow-y: auto; max-height: 480px; padding-right: 0.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.theme-item-mini-v2 { padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; border-left: 4px solid #e91e8c; }
+.formation-meta-edit-mini-v2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: #f0fdfd; padding: 0.75rem; border-radius: 8px; margin: 0.5rem 0; border: 1px solid #c2eaea; }
+.mini-pdf-row { display: flex; align-items: center; gap: 0.4rem; }
+.file-input-xs { font-size: 0.65rem; width: 100%; }
+.pdf-tag { font-size: 0.6rem; font-weight: 800; background: #42b9b5; color: #fff; padding: 2px 6px; border-radius: 4px; }
+.btn-save-full { width: 100%; background: #42b9b5; color: #fff; border: none; padding: 0.8rem; border-radius: 10px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn-save-full:hover { opacity: 0.9; }
+.btn-cancel-full { width: 100%; background: none; border: 1px solid #e2e8f0; color: #64748b; padding: 0.8rem; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-8 { margin-top: 2rem; }
+.mini-input-date { padding: 0.35rem; border: 1.1px solid #c2eaea; border-radius: 6px; font-size: 0.8rem; width: 100%; outline: none; background: #fff; color: #42b9b5; font-weight: 700; cursor: pointer; }
+.mini-input-date:focus { border-color: #42b9b5; }
 </style>

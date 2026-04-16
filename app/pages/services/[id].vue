@@ -12,6 +12,17 @@ useHead({
 })
 
 const openThemeId = ref(null)
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'À venir'
+  try {
+    const date = new Date(dateStr)
+    if (isNaN(date.getTime())) return dateStr
+    return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date)
+  } catch (e) {
+    return dateStr
+  }
+}
+
 const toggleTheme = (id) => {
   openThemeId.value = openThemeId.value === id ? null : id
 }
@@ -47,12 +58,14 @@ const toggleFormation = (id) => {
 
       <div class="service-main">
         <div class="service-content">
-          <h2 class="section-title">Présentation du service</h2>
-          <div class="description-text" v-if="service.description">
-            <p v-for="(para, idx) in service.description.split('\n')" :key="idx">
-              {{ para }}
-            </p>
-          </div>
+          <template v-if="!service.title.toLowerCase().includes('formation')">
+            <h2 class="section-title">Présentation du service</h2>
+            <div class="description-text" v-if="service.description">
+              <p v-for="(para, idx) in service.description.split('\n')" :key="idx">
+                {{ para }}
+              </p>
+            </div>
+          </template>
 
           <!-- Accordion Themes -->
           <div v-if="service.themes && service.themes.length > 0" class="themes-accordion">
@@ -81,8 +94,40 @@ const toggleFormation = (id) => {
             </div>
           </div>
 
-          <!-- Accordion Formations -->
-          <div v-if="service.formations && service.formations.length > 0" class="formations-section">
+          <!-- Custom Calendar Layout for Formations -->
+          <div v-if="service.title.toLowerCase().includes('formation') && service.formations && service.formations.length > 0" class="formations-calendar">
+            <h2 class="section-title mt-12">Calendrier des formations</h2>
+            <div class="calendar-list">
+              <div v-for="form in service.formations" :key="form.id" class="calendar-item">
+                <div class="calendar-date-col">
+                  <div class="date-badge">
+                    <span class="date-text">{{ formatDate(form.date) }}</span>
+                  </div>
+                  <div class="date-line"></div>
+                </div>
+                <div class="calendar-content-card">
+                  <div class="card-header-flex">
+                    <h3 class="form-title">{{ form.title }}</h3>
+                    <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" download class="btn-download" title="Télécharger le programme PDF">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                      <span>Programme PDF</span>
+                    </a>
+                  </div>
+                  <div class="form-objectives-box">
+                    <div class="objectives-label-small">Objectifs pédagogiques :</div>
+                    <ul class="form-obj-list">
+                      <li v-for="(line, lidx) in form.objectives.split('\n').filter(l => l.trim())" :key="lidx">
+                        {{ line }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Standard Accordion Formations (fallback if not 'Formations' service) -->
+          <div v-else-if="service.formations && service.formations.length > 0" class="formations-section">
             <h2 class="section-title mt-12">Nos formations</h2>
             <div class="themes-accordion">
               <div 
@@ -99,12 +144,16 @@ const toggleFormation = (id) => {
                 </button>
                 <div class="theme-body">
                   <div class="theme-body-inner">
-                    <div class="objectives-label" style="color: #F7A600;">Objectifs pédagogiques</div>
+                    <div class="objectives-label" style="color: #42b9b5;">Objectifs pédagogiques</div>
                     <ul class="objectives-list">
                       <li v-for="(line, lidx) in form.objectives.split('\n').filter(l => l.trim())" :key="lidx" class="li-formation">
                         {{ line }}
                       </li>
                     </ul>
+                    <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" download class="download-link-simple" style="margin-top: 1rem; display: inline-flex; align-items:center; gap: 0.5rem; color: #42b9b5; text-decoration: none; font-weight: 700;">
+                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                       Télécharger le programme (PDF)
+                    </a>
                   </div>
                 </div>
               </div>
@@ -117,14 +166,7 @@ const toggleFormation = (id) => {
         </div>
 
         <aside class="service-sidebar">
-          <div v-if="service.categories && service.categories.length > 0" class="sidebar-categories">
-            <span class="sidebar-label">Catégorie(s)</span>
-            <div class="tags-list">
-              <NuxtLink v-for="cat in service.categories" :key="cat.id" :to="`/categories/${cat.id}`" class="category-tag">
-                {{ cat.titre }}
-              </NuxtLink>
-            </div>
-          </div>
+
 
           <div class="contact-card">
             <h3>Besoin d'accompagnement ?</h3>
@@ -472,14 +514,190 @@ const toggleFormation = (id) => {
 .formations-section { margin-top: 3.5rem; }
 
 .formation-card.is-open {
-  border-color: #F7A600;
+  border-color: #42b9b5;
 }
 
 .formation-card.is-open .theme-icon {
-  background: #F7A600;
+  background: #42b9b5;
 }
 
 .li-formation::before {
-  color: #F7A600 !important;
+  color: #42b9b5 !important;
+}
+
+/* Calendar Styles */
+.formations-calendar {
+  margin-top: 4rem;
+}
+
+.calendar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 2rem;
+}
+
+.calendar-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1.5rem;
+}
+
+.calendar-date-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding-top: 1rem;
+}
+
+.date-badge {
+  background: #42b9b5;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(66, 185, 181, 0.2);
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+  line-height: 1.3;
+}
+
+.date-line {
+  width: 2px;
+  flex: 1;
+  background: #e2e8f0;
+  margin: 0.5rem 0;
+}
+
+.calendar-item:last-child .date-line {
+  display: none;
+}
+
+.calendar-content-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.75rem;
+  margin-bottom: 2.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.calendar-content-card:hover {
+  transform: translateX(8px);
+  border-color: #42b9b5;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+}
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.btn-download {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.6rem 1.1rem;
+  border-radius: 12px;
+  color: #475569;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-download:hover {
+  background: #1a1a2e;
+  border-color: #1a1a2e;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-download svg {
+  width: 18px;
+  height: 18px;
+}
+
+.form-objectives-box {
+  background: #f0f9f9;
+  padding: 1.25rem;
+  border-radius: 14px;
+  border-left: 4px solid #42b9b5;
+}
+
+.objectives-label-small {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #42b9b5;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.form-obj-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.5rem 1.5rem;
+}
+
+.form-obj-list li {
+  font-size: 0.95rem;
+  color: #334155;
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.form-obj-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #42b9b5;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .calendar-item {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .calendar-date-col {
+    align-items: flex-start;
+  }
+  
+  .date-line {
+    display: none;
+  }
+  
+  .card-header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-obj-list {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
