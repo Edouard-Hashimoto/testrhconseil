@@ -59,7 +59,7 @@ const toggleFormation = (id) => {
       <div class="service-main">
         <div class="service-content">
           <template v-if="!service.title.toLowerCase().includes('formation')">
-            <h2 class="section-title">Présentation du service</h2>
+            <h2 class="section-title">Prestations</h2>
             <div class="description-text" v-if="service.description">
               <p v-for="(para, idx) in service.description.split('\n')" :key="idx">
                 {{ para }}
