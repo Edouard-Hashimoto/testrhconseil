@@ -2,6 +2,9 @@
 const { data: news } = await useFetch('/api/news')
 const { data: services } = await useFetch('/api/services')
 const { data: statistics } = await useFetch('/api/statistics')
+const { data: settings } = await useFetch('/api/settings')
+
+const qualiopiVisible = computed(() => !settings.value || settings.value.qualiopi_visible === '1')
 
 const mainStat = computed(() => statistics.value && statistics.value.length > 0 ? statistics.value[0] : null)
 const latestNews = computed(() => news.value && news.value.length > 0 ? news.value[0] : null)
@@ -159,7 +162,7 @@ onMounted(() => {
       </div>
     </section>
 
-    <section class="qualiopi-section">
+    <section v-if="qualiopiVisible" class="qualiopi-section">
       <div class="qualiopi-bg-icon">
         <img src="~/assets/picto/award.png" alt="" />
       </div>
