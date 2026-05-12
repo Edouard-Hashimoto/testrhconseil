@@ -75,6 +75,15 @@ const { data: settingsData } = await useFetch('/api/settings')
 const qualiopiVisible = ref(settingsData.value?.qualiopi_visible === '1')
 const qualiopiText = ref(settingsData.value?.qualiopi_text ?? '')
 const qualiopiLogoUrl = ref(settingsData.value?.qualiopi_logo || '')
+
+const homeHeroTitle = ref(settingsData.value?.home_hero_title || 'Une DIVERSITÉ de&nbsp;COMPÉTENCES pour AGIR')
+const homeVideoUrl = ref(settingsData.value?.home_video_url || 'https://www.youtube.com/embed/buDVHjbVhWk')
+const homePresTitle = ref(settingsData.value?.home_pres_title || 'PRÉSENTATION DE <br> <strong>RH CONSEIL 71</strong>')
+const homePresP1 = ref(settingsData.value?.home_pres_p1 || 'Cabinet à taille humaine, RH CONSEIL 71 a été créé en 2004. Nous accompagnons les entreprises dans la recherche de performances et le développement des compétences dans les domaines RH, RECRUTEMENT et QHSE.')
+const homePresP2 = ref(settingsData.value?.home_pres_p2 || 'Longtemps certifié ISO 9001 et toujours en démarche d’amélioration continue, RH Conseil 71 considère que la qualité fait partie intégrante de sa culture, au bénéfice de ses clients.')
+const homePresBtn = ref(settingsData.value?.home_pres_btn || 'Découvrir l\'équipe')
+const homeMissionsTitle = ref(settingsData.value?.home_missions_title || 'Nos missions sont assurées par une équipe opérationnelle pluridisciplinaire et complémentaire&nbsp;:')
+
 const qualiopiLogoFile = ref(null)
 const qualiopiLogoInput = ref(null)
 const isSavingSettings = ref(false)
@@ -114,6 +123,13 @@ const saveSettings = async () => {
       body: {
         qualiopi_visible: qualiopiVisible.value ? '1' : '0',
         qualiopi_text: qualiopiText.value,
+        home_hero_title: homeHeroTitle.value,
+        home_video_url: homeVideoUrl.value,
+        home_pres_title: homePresTitle.value,
+        home_pres_p1: homePresP1.value,
+        home_pres_p2: homePresP2.value,
+        home_pres_btn: homePresBtn.value,
+        home_missions_title: homeMissionsTitle.value,
       }
     })
     settingsSaved.value = true
@@ -246,9 +262,51 @@ const saveSettings = async () => {
       <section class="card">
         <h2 class="card-title">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
-          Paramètres du site
+          Paramètres de la page d'accueil
         </h2>
         <div class="settings-block">
+          
+          <div class="field span-full" style="margin-top: 1rem;">
+            <label>Titre de l'en-tête (Hero)</label>
+            <textarea v-model="homeHeroTitle" rows="2" placeholder="Titre principal de la page..."></textarea>
+            <p class="settings-hint" style="margin-top: 0.2rem; font-size: 0.8rem; color: #64748b;">Vous pouvez utiliser des balises HTML comme <code>&lt;br&gt;</code> ou <code>&amp;nbsp;</code></p>
+          </div>
+          
+          <div class="field span-full" style="margin-top: 1rem;">
+            <label>URL de la vidéo YouTube (Dashboard)</label>
+            <input v-model="homeVideoUrl" type="text" placeholder="https://www.youtube.com/embed/..." />
+          </div>
+
+          <div class="field span-full" style="margin-top: 1rem;">
+            <label>Titre Présentation</label>
+            <input v-model="homePresTitle" type="text" />
+            <p class="settings-hint" style="margin-top: 0.2rem; font-size: 0.8rem; color: #64748b;">Utilisez <code>&lt;strong&gt;</code> pour le gras, <code>&lt;br&gt;</code> pour le retour à la ligne.</p>
+          </div>
+
+          <div class="field span-full" style="margin-top: 1rem;">
+            <label>Présentation - Paragraphe 1</label>
+            <textarea v-model="homePresP1" rows="3"></textarea>
+          </div>
+
+          <div class="field span-full" style="margin-top: 1rem;">
+            <label>Présentation - Paragraphe 2</label>
+            <textarea v-model="homePresP2" rows="3"></textarea>
+          </div>
+
+          <div class="field span-full" style="margin-top: 1rem;">
+            <label>Texte du bouton Présentation</label>
+            <input v-model="homePresBtn" type="text" />
+          </div>
+
+          <div class="field span-full" style="margin-top: 1rem;">
+            <label>Titre Missions</label>
+            <textarea v-model="homeMissionsTitle" rows="2"></textarea>
+          </div>
+
+          <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e2e8f0;" />
+
+          <h3 class="card-title" style="margin-bottom: 0.5rem; font-size: 0.95rem;">Section Qualiopi</h3>
+
           <div class="settings-row">
             <div class="settings-label-group">
               <span class="settings-label">Section Qualiopi dans le footer</span>

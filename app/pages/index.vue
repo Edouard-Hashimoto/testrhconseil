@@ -4,7 +4,20 @@ const { data: services } = await useFetch('/api/services')
 const { data: statistics } = await useFetch('/api/statistics')
 const { data: settings } = await useFetch('/api/settings')
 
+const homeHeroTitle = computed(() => settings.value?.home_hero_title || 'Une DIVERSITÉ de&nbsp;COMPÉTENCES pour AGIR')
+const homeVideoUrl = computed(() => settings.value?.home_video_url || 'https://www.youtube.com/embed/buDVHjbVhWk')
+const homePresTitle = computed(() => settings.value?.home_pres_title || 'PRÉSENTATION DE <br> <strong>RH CONSEIL 71</strong>')
+const homePresP1 = computed(() => settings.value?.home_pres_p1 || 'Cabinet à taille humaine, RH CONSEIL 71 a été créé en 2004. Nous accompagnons les entreprises dans la recherche de performances et le développement des compétences dans les domaines RH, RECRUTEMENT et QHSE.')
+const homePresP2 = computed(() => settings.value?.home_pres_p2 || 'Longtemps certifié ISO 9001 et toujours en démarche d’amélioration continue, RH Conseil 71 considère que la qualité fait partie intégrante de sa culture, au bénéfice de ses clients.')
+const homePresBtn = computed(() => settings.value?.home_pres_btn || 'Découvrir l\'équipe')
+const homeMissionsTitle = computed(() => settings.value?.home_missions_title || 'Nos missions sont assurées par une équipe opérationnelle pluridisciplinaire et complémentaire&nbsp;:')
+
 const qualiopiVisible = computed(() => !settings.value || settings.value.qualiopi_visible === '1')
+
+const qualiopiTextLines = computed(() => {
+  const text = settings.value?.qualiopi_text || "Certifié QUALIOPI au titre des catégories d’actions suivantes :\nACTIONS DE FORMATION\nBILANS DE COMPETENCES"
+  return text.split('\n').filter(Boolean)
+})
 
 const mainStat = computed(() => statistics.value && statistics.value.length > 0 ? statistics.value[0] : null)
 const latestNews = computed(() => news.value && news.value.length > 0 ? news.value[0] : null)
@@ -45,9 +58,7 @@ onMounted(() => {
     <section class="hero-section">
       <div class="hero-inner">
         <div class="hero-text">
-          <h1 class="hero-title">
-            Une DIVERSITÉ de&nbsp;COMPÉTENCES pour AGIR
-          </h1>
+          <h1 class="hero-title" v-html="homeHeroTitle"></h1>
         </div>
         <div class="hero-img">
           <img src="~/assets/img/logo_rhc.png" alt="RH Conseil 71 — Diversité de compétences" />
@@ -81,7 +92,7 @@ onMounted(() => {
             <template v-for="item in servicesWithVideo" :key="item.id">
               <div v-if="item.isVideo" class="service-card video-card">
                 <iframe
-                  src="https://www.youtube.com/embed/buDVHjbVhWk"
+                  :src="homeVideoUrl"
                   title="YouTube video player"
                   frameborder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -116,10 +127,10 @@ onMounted(() => {
     <section class="presentation-section">
       <div class="pres-inner">
         <div class="pres-text">
-          <h2 class="pres-title">PRÉSENTATION DE <br> <strong>RH CONSEIL 71</strong></h2>
-          <p class="pres-para">Cabinet à taille humaine, RH CONSEIL 71 a été créé en 2004. Nous accompagnons les entreprises dans la recherche de performances et le développement des compétences dans les domaines RH, RECRUTEMENT et QHSE.</p>
-          <p class="pres-para">Longtemps certifié ISO 9001 et toujours en démarche d’amélioration continue, RH Conseil 71 considère que la qualité fait partie intégrante de sa culture, au bénéfice de ses clients.</p>
-          <NuxtLink to="/presentation" class="pres-btn">Découvrir l'équipe</NuxtLink>
+          <h2 class="pres-title" v-html="homePresTitle"></h2>
+          <p class="pres-para">{{ homePresP1 }}</p>
+          <p class="pres-para">{{ homePresP2 }}</p>
+          <NuxtLink to="/presentation" class="pres-btn">{{ homePresBtn }}</NuxtLink>
         </div>
 
         <div ref="presImgRef" class="pres-img-wrap">
@@ -130,9 +141,7 @@ onMounted(() => {
 
     <section class="missions-section">
       <div class="missions-inner">
-        <h2 class="missions-title">
-          Nos missions sont assurées par une équipe opérationnelle pluridisciplinaire et complémentaire&nbsp;:
-        </h2>
+        <h2 class="missions-title" v-html="homeMissionsTitle"></h2>
         <div class="missions-grid">
           <div class="mission-card card-lime">
             <div class="mission-icon-wrap">
@@ -164,14 +173,14 @@ onMounted(() => {
 
     <section v-if="qualiopiVisible" class="qualiopi-section">
       <div class="qualiopi-bg-icon">
-        <img src="~/assets/picto/award.png" alt="" />
+        <img v-if="settings?.qualiopi_logo" :src="useAssetUrl(settings.qualiopi_logo, 'qualiopi')" alt="" />
+        <img v-else src="~/assets/picto/award.png" alt="" />
       </div>
       <div class="qualiopi-inner">
         <div class="qualiopi-content">
-          <h2 class="qualiopi-title">Certifié QUALIOPI au titre des catégories d’actions suivantes&nbsp;:</h2>
-          <ul class="qualiopi-list">
-            <li>ACTIONS DE FORMATION</li>
-            <li>BILANS DE COMPETENCES</li>
+          <h2 class="qualiopi-title">{{ qualiopiTextLines[0] }}</h2>
+          <ul class="qualiopi-list" v-if="qualiopiTextLines.length > 1">
+            <li v-for="line in qualiopiTextLines.slice(1)" :key="line">{{ line }}</li>
           </ul>
           <div class="qualiopi-actions">
             <a href="/certificat.pdf" download class="btn-certif btn-download">
