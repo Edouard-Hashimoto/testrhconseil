@@ -12,7 +12,7 @@ useHead({
     <div class="page-header">
       <h1 class="page-title">Particuliers</h1>
       <p class="page-desc">
-        Nous accompagnons les particuliers dans leurs démarches personnelles de Bilan de compétences, accompagnement individuel type coaching professionnel, ou encore VAE.
+        Nous accompagnons les particuliers dans leurs démarches personnelles de Bilan de compétences, accompagnement individuel type coaching professionnel.
       </p>
     </div>
 
