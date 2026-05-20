@@ -97,6 +97,16 @@ const toggleFormation = (id) => {
           <!-- Custom Calendar Layout for Formations -->
           <div v-if="service.title.toLowerCase().includes('formation') && service.formations && service.formations.length > 0" class="formations-calendar">
             <h2 class="section-title mt-12">Calendrier des formations</h2>
+            <NuxtLink to="/livret" class="catalogue-banner">
+              <span class="catalogue-banner-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+              </span>
+              <span class="catalogue-banner-text">
+                <strong>Catalogue des formations 2026</strong>
+                <span>Consultez l'ensemble de nos formations disponibles</span>
+              </span>
+              <span class="catalogue-banner-arrow">→</span>
+            </NuxtLink>
             <div class="calendar-list">
               <div v-for="form in service.formations" :key="form.id" class="calendar-item">
                 <div class="calendar-date-col">
@@ -129,6 +139,16 @@ const toggleFormation = (id) => {
           <!-- Standard Accordion Formations (fallback if not 'Formations' service) -->
           <div v-else-if="service.formations && service.formations.length > 0" class="formations-section">
             <h2 class="section-title mt-12">Nos formations</h2>
+            <NuxtLink to="/livret" class="catalogue-banner">
+              <span class="catalogue-banner-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+              </span>
+              <span class="catalogue-banner-text">
+                <strong>Catalogue des formations 2026</strong>
+                <span>Consultez l'ensemble de nos formations disponibles</span>
+              </span>
+              <span class="catalogue-banner-arrow">→</span>
+            </NuxtLink>
             <div class="themes-accordion">
               <div 
                 v-for="form in service.formations" 
@@ -167,6 +187,14 @@ const toggleFormation = (id) => {
 
         <aside class="service-sidebar">
 
+          <div v-if="service.formations && service.formations.length > 0" class="sidebar-catalogue-card">
+            <div class="sidebar-catalogue-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+            </div>
+            <h3>Catalogue des formations</h3>
+            <p>Découvrez l'ensemble de nos formations dans notre livret 2026.</p>
+            <NuxtLink to="/livret" class="btn-catalogue">Voir le catalogue →</NuxtLink>
+          </div>
 
           <div class="contact-card">
             <h3>Besoin d'accompagnement ?</h3>
@@ -512,6 +540,117 @@ const toggleFormation = (id) => {
 
 .mt-12 { margin-top: 3rem; }
 .formations-section { margin-top: 3.5rem; }
+
+/* Catalogue Banner */
+.catalogue-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #f0f9f9 0%, #e6f7f7 100%);
+  border: 1px solid #b2e4e2;
+  border-left: 4px solid #42b9b5;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  margin: 1.5rem 0 2rem;
+  transition: all 0.2s ease;
+}
+
+.catalogue-banner:hover {
+  background: linear-gradient(135deg, #e0f5f5 0%, #d4f0ef 100%);
+  border-color: #42b9b5;
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(66, 185, 181, 0.15);
+}
+
+.catalogue-banner-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #42b9b5;
+  border-radius: 10px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.catalogue-banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.catalogue-banner-text strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.catalogue-banner-text span {
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.catalogue-banner-arrow {
+  font-size: 1.2rem;
+  color: #42b9b5;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Sidebar Catalogue Card */
+.sidebar-catalogue-card {
+  background: #fff;
+  padding: 1.75rem;
+  border-radius: 20px;
+  border: 1px solid #b2e4e2;
+  text-align: center;
+}
+
+.sidebar-catalogue-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #f0f9f9;
+  border-radius: 12px;
+  color: #42b9b5;
+  margin-bottom: 1rem;
+}
+
+.sidebar-catalogue-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.75rem;
+}
+
+.sidebar-catalogue-card p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+
+.btn-catalogue {
+  display: block;
+  padding: 0.75rem;
+  background: #42b9b5;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-catalogue:hover {
+  background: #38a7a3;
+  transform: translateY(-2px);
+}
 
 .formation-card.is-open {
   border-color: #42b9b5;

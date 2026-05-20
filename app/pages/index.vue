@@ -172,10 +172,6 @@ onMounted(() => {
     </section>
 
     <section v-if="qualiopiVisible" class="qualiopi-section">
-      <div class="qualiopi-bg-icon">
-        <img v-if="settings?.qualiopi_logo" :src="useAssetUrl(settings.qualiopi_logo, 'qualiopi')" alt="" />
-        <img v-else src="~/assets/picto/award.png" alt="" />
-      </div>
       <div class="qualiopi-inner">
         <div class="qualiopi-content">
           <h2 class="qualiopi-title">{{ qualiopiTextLines[0] }}</h2>
@@ -859,21 +855,7 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.qualiopi-bg-icon {
-  position: absolute;
-  top: 50%;
-  left: 25%;
-  transform: translate(-50%, -50%);
-  width: 450px;
-  opacity: 0.25;
-  pointer-events: none;
-}
 
-.qualiopi-bg-icon img {
-  width: 100%;
-  height: auto;
-  filter: grayscale(1) brightness(2);
-}
 
 .qualiopi-inner {
   position: relative;
@@ -950,10 +932,6 @@ onMounted(() => {
 @media (max-width: 768px) {
   .qualiopi-section {
     padding: 4rem 1.5rem;
-  }
-  .qualiopi-bg-icon {
-    width: 300px;
-    left: 50%;
   }
   .qualiopi-content {
     text-align: center;
