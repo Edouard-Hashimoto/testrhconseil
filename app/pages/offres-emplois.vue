@@ -9,7 +9,7 @@ useHead({
   <div class="offres-page">
     <div class="container">
       <div class="title-wrapper">
-        <h1 class="page-title">Offres d'emploies</h1>
+        <h1 class="page-title">Offres d'emploi</h1>
         <div class="title-underline"></div>
       </div>
 

@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from 'vue'
+
 const route = useRoute()
 const { data: particulier, error } = await useFetch(`/api/particuliers/${route.params.id}`)
 
@@ -9,6 +11,13 @@ if (error.value) {
 useHead({
   title: `${particulier.value?.titre || 'Service Particulier'} - RH Conseil 71`,
   meta: [{ name: 'description', content: `Découvrez notre service ${particulier.value?.titre}` }]
+})
+
+const isBilanDeCompetences = computed(() => {
+  if (!particulier.value) return false
+  return String(particulier.value.id) === '5' || 
+         particulier.value.titre.toLowerCase().includes('bilan de compétences') ||
+         particulier.value.titre.toLowerCase().includes('bilan de competences')
 })
 </script>
 
@@ -47,6 +56,26 @@ useHead({
           </div>
           <div v-else class="no-description">
             <p>Détails à venir pour ce service...</p>
+          </div>
+
+          <div v-if="isBilanDeCompetences" class="download-section">
+            <div class="download-card">
+              <div class="download-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                </svg>
+              </div>
+              <div class="download-info">
+                <h4 class="download-card-title">Programme du Bilan de compétences</h4>
+                <p class="download-card-desc">Consultez et téléchargez notre programme complet pour découvrir en détail le déroulement de notre accompagnement.</p>
+              </div>
+              <a href="/bilan.pdf" download="Programme_Bilan_de_competences_RH_Conseil_71.pdf" class="btn-download">
+                <span>Télécharger</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="btn-download-icon">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -291,6 +320,109 @@ useHead({
     font-size: 0.8rem;
     display: flex;
     flex-wrap: wrap;
+  }
+}
+
+.download-section {
+  margin-top: 3.5rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 2.5rem;
+}
+
+.download-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: #f8fafc;
+  border: 1.5px dashed var(--theme-color);
+  border-radius: 20px;
+  padding: 1.75rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.download-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+}
+
+.download-icon {
+  width: 52px;
+  height: 52px;
+  background: #e2f5f4;
+  background-color: color-mix(in srgb, var(--theme-color) 12%, transparent);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-color);
+  flex-shrink: 0;
+}
+
+.download-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.download-info {
+  flex: 1;
+}
+
+.download-card-title {
+  font-size: 1.15rem;
+  font-weight: 750;
+  color: #0f172a;
+  margin: 0 0 0.35rem 0;
+}
+
+.download-card-desc {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--theme-color);
+  color: #fff;
+  padding: 0.8rem 1.6rem;
+  border-radius: 50px;
+  font-weight: 750;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(66, 185, 181, 0.2);
+}
+
+.btn-download:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(66, 185, 181, 0.3);
+}
+
+.btn-download-icon {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 640px) {
+  .download-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    gap: 1.25rem;
+  }
+  
+  .download-icon {
+    margin: 0 auto;
+  }
+  
+  .btn-download {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>
