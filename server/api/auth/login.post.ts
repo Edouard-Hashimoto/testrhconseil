@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     setCookie(event, 'auth_session', 'authenticated', {
       path: '/',
       maxAge: 60 * 60 * 24,
-      httpOnly: false, // Must be false to be readable by useCookie in client-side middleware
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax'
     });
