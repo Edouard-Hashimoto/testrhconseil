@@ -13,15 +13,26 @@ export const useCloudinary = () => {
   return cloudinary;
 };
 
-export const uploadToCloudinary = async (fileBuffer: Buffer | ArrayBuffer, folder: string, resourceType: 'auto' | 'image' | 'video' | 'raw' = 'auto') => {
+export const uploadToCloudinary = async (
+  fileBuffer: Buffer | ArrayBuffer, 
+  folder: string, 
+  resourceType: 'auto' | 'image' | 'video' | 'raw' = 'auto',
+  customFilename?: string
+) => {
   const cloudinary = useCloudinary();
+  
+  const options: any = { 
+    folder: `rhc/${folder}`,
+    resource_type: resourceType
+  };
+
+  if (customFilename) {
+    options.public_id = customFilename;
+  }
   
   return new Promise<{ url: string; public_id: string }>((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
-      { 
-        folder: `rhc/${folder}`,
-        resource_type: resourceType
-      },
+      options,
       (error, result) => {
         if (error || !result) return reject(error);
         resolve({

@@ -15,7 +15,26 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Seuls les fichiers PDF sont acceptés' });
   }
 
-  const { url } = await uploadToCloudinary(await file.arrayBuffer(), 'formations', 'raw');
+  // Générer un nom de fichier unique et sécurisé qui préserve l'extension .pdf
+  const originalName = file.name || 'document.pdf';
+  const ext = originalName.split('.').pop() || 'pdf';
+  const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || 'document';
+  
+  const sanitizedName = nameWithoutExt
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Supprime les accents
+    .replace(/[^a-zA-Z0-9-_]/g, '_') // Remplace les caractères spéciaux
+    .substring(0, 60);
+
+  const uniqueSuffix = Math.random().toString(36).substring(2, 10);
+  const customFilename = `${sanitizedName}_${uniqueSuffix}.${ext}`;
+
+  const { url } = await uploadToCloudinary(
+    await file.arrayBuffer(), 
+    'formations', 
+    'raw', 
+    customFilename
+  );
 
   return { filename: url, url };
 });
