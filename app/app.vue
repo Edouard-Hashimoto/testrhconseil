@@ -5,5 +5,6 @@
       <NuxtPage/>
     </main>
     <AppFooter />
+    <CookieBanner />
   </div>
 </template>
