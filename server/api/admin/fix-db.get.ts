@@ -20,6 +20,13 @@ export default defineEventHandler(async (event) => {
       logs.push("Colonne 'pdf_url' déjà présente ou erreur ignorée.");
     }
 
+    try {
+      await db.execute("ALTER TABLE service_formations ADD COLUMN inscription_url TEXT");
+      logs.push("Colonne 'inscription_url' ajoutée avec succès.");
+    } catch (e) {
+      logs.push("Colonne 'inscription_url' déjà présente ou erreur ignorée.");
+    }
+
     return { success: true, logs };
   } catch (err: any) {
     return { success: false, error: err.message, logs };

@@ -70,10 +70,10 @@ export default defineEventHandler(async (event) => {
         args: [Number(serviceId)]
       });
       for (const form of body.formations) {
-        if (form.title && form.objectives) {
+        if (form.title && form.title.trim()) {
           await db.execute({
-            sql: 'INSERT INTO service_formations (service_id, title, objectives, date, pdf_url) VALUES (?, ?, ?, ?, ?)',
-            args: [Number(serviceId), form.title, form.objectives, form.date || null, form.pdf_url || null]
+            sql: 'INSERT INTO service_formations (service_id, title, objectives, date, pdf_url, inscription_url) VALUES (?, ?, ?, ?, ?, ?)',
+            args: [Number(serviceId), form.title, form.objectives || '', form.date || null, form.pdf_url || null, form.inscription_url || null]
           });
         }
       }

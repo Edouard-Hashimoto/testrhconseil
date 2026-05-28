@@ -118,6 +118,7 @@ export const initDb = async () => {
       objectives TEXT NOT NULL,
       date TEXT,
       pdf_url TEXT,
+      inscription_url TEXT,
       FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
     )`
   ], "write");
@@ -125,6 +126,7 @@ export const initDb = async () => {
   // Migrations for existing tables
   try { await db.execute(`ALTER TABLE service_formations ADD COLUMN date TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE service_formations ADD COLUMN pdf_url TEXT`); } catch(e) {}
+  try { await db.execute(`ALTER TABLE service_formations ADD COLUMN inscription_url TEXT`); } catch(e) {}
 
   // Migration des données existantes vers la table de jointure
   await db.execute(`

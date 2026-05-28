@@ -75,7 +75,7 @@ const createService = async (evt) => {
       return {
         ...f,
         pdf_url,
-        objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+        objectives: ''
       }
     }))
     
@@ -106,6 +106,7 @@ const startEdit = (service) => {
       ...f,
       date: f.date || '',
       pdf_url: f.pdf_url || '',
+      inscription_url: f.inscription_url || '',
       _pdfFile: null,
       objectives: f.objectives ? f.objectives.split('\n').filter(o => o.trim()) : ['']
     })) : []
@@ -131,6 +132,7 @@ const addFormation = (target) => {
     objectives: [''], 
     date: '', 
     pdf_url: '', 
+    inscription_url: '', 
     _pdfFile: null 
   })
 }
@@ -150,6 +152,7 @@ const migrateThemesToFormations = (target) => {
     objectives: [...t.objectives],
     date: today,
     pdf_url: '',
+    inscription_url: '',
     _pdfFile: null
   }))
   
@@ -193,7 +196,7 @@ const saveEdit = async (evt) => {
       return {
         ...f,
         pdf_url: currentPdf,
-        objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
+        objectives: ''
       }
     }))
     
@@ -376,16 +379,12 @@ const deleteService = async (id) => {
                       <span v-if="form.pdf_url" class="pdf-status">✓ En ligne</span>
                     </div>
                   </div>
+                  <div class="field" style="grid-column: span 2;">
+                    <label class="label-tiny">Lien d'inscription (ex: https://...)</label>
+                    <input v-model="form.inscription_url" type="text" placeholder="Entrez le lien du site d'inscription..." />
+                  </div>
                 </div>
 
-                <div class="objectives-edit-section">
-                  <span class="label-tiny">Objectifs pédagogiques</span>
-                  <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="objective-field-row">
-                    <input v-model="form.objectives[oIdx]" type="text" placeholder="Saisir un objectif..." class="grow" />
-                    <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
-                  </div>
-                  <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain">+ Ajouter un objectif</button>
-                </div>
               </div>
             </div>
           </div>
@@ -516,13 +515,10 @@ const deleteService = async (id) => {
                                       <span v-if="form.pdf_url" class="pdf-tag">OK</span>
                                     </div>
                                   </div>
-                                </div>
-                                <div class="mini-objectives">
-                                  <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="mini-objective-row">
-                                    <input v-model="form.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
-                                    <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
+                                  <div class="field" style="grid-column: span 2;">
+                                    <span class="label-tiny">Lien d'inscription (ex: https://...)</span>
+                                    <input v-model="form.inscription_url" type="text" placeholder="Entrez le lien..." class="mini-input" />
                                   </div>
-                                  <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain" style="color: #F7A600;">+ Obj.</button>
                                 </div>
                               </div>
                             </div>

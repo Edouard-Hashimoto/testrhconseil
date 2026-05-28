@@ -47,6 +47,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
+const route = useRoute()
 const form = ref({
   nom: '',
   prenom: '',
@@ -89,6 +90,10 @@ const handleSubmit = async () => {
 }
 
 onMounted(async () => {
+  if (route.query.message) {
+    form.value.message = String(route.query.message)
+  }
+
   if (process.client) {
     const L = await import('leaflet')
     import('leaflet/dist/leaflet.css')

@@ -116,20 +116,22 @@ const toggleFormation = (id) => {
                   <div class="date-line"></div>
                 </div>
                 <div class="calendar-content-card">
-                  <div class="card-header-flex">
-                    <h3 class="form-title">{{ form.title }}</h3>
-                    <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" download class="btn-download" title="Télécharger le programme PDF">
+                  <h3 class="form-title">{{ form.title }}</h3>
+                  <div class="card-buttons">
+                    <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" class="btn-download" title="Télécharger le programme PDF">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                       <span>Programme PDF</span>
                     </a>
-                  </div>
-                  <div class="form-objectives-box">
-                    <div class="objectives-label-small">Objectifs pédagogiques :</div>
-                    <ul class="form-obj-list">
-                      <li v-for="(line, lidx) in form.objectives.split('\n').filter(l => l.trim())" :key="lidx">
-                        {{ line }}
-                      </li>
-                    </ul>
+                    <a 
+                      v-if="form.inscription_url" 
+                      :href="form.inscription_url" 
+                      target="_blank" 
+                      class="btn-register"
+                      :style="{ background: service.color || '#42b9b5' }"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                      <span>S'inscrire</span>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -164,16 +166,22 @@ const toggleFormation = (id) => {
                 </button>
                 <div class="theme-body">
                   <div class="theme-body-inner">
-                    <div class="objectives-label" style="color: #42b9b5;">Objectifs pédagogiques</div>
-                    <ul class="objectives-list">
-                      <li v-for="(line, lidx) in form.objectives.split('\n').filter(l => l.trim())" :key="lidx" class="li-formation">
-                        {{ line }}
-                      </li>
-                    </ul>
-                    <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" download class="download-link-simple" style="margin-top: 1rem; display: inline-flex; align-items:center; gap: 0.5rem; color: #42b9b5; text-decoration: none; font-weight: 700;">
-                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 18px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                       Télécharger le programme (PDF)
-                    </a>
+                    <div class="card-buttons" style="margin-top: 0;">
+                      <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" class="btn-download" title="Télécharger le programme PDF">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                        <span>Programme PDF</span>
+                      </a>
+                      <a 
+                        v-if="form.inscription_url" 
+                        :href="form.inscription_url" 
+                        target="_blank" 
+                        class="btn-register"
+                        :style="{ background: service.color || '#42b9b5' }"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                        <span>S'inscrire</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -706,9 +714,10 @@ const toggleFormation = (id) => {
 
 .date-line {
   width: 2px;
-  flex: 1;
+  position: absolute;
+  top: 3.5rem;
+  bottom: -3.5rem;
   background: #e2e8f0;
-  margin: 0.5rem 0;
 }
 
 .calendar-item:last-child .date-line {
@@ -719,8 +728,8 @@ const toggleFormation = (id) => {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 20px;
-  padding: 1.75rem;
-  margin-bottom: 2.5rem;
+  padding: 2rem;
+  margin-bottom: 3.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
@@ -734,9 +743,8 @@ const toggleFormation = (id) => {
 .card-header-flex {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 1.5rem;
-  margin-bottom: 1.25rem;
 }
 
 .form-title {
@@ -745,6 +753,14 @@ const toggleFormation = (id) => {
   color: #1a1a2e;
   margin: 0;
   line-height: 1.3;
+}
+
+.card-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-shrink: 0;
+  margin-top: 1.5rem;
 }
 
 .btn-download {
@@ -775,45 +791,30 @@ const toggleFormation = (id) => {
   height: 18px;
 }
 
-.form-objectives-box {
-  background: #f0f9f9;
-  padding: 1.25rem;
-  border-radius: 14px;
-  border-left: 4px solid #42b9b5;
+.btn-register {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: white;
+  padding: 0.6rem 1.1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.objectives-label-small {
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: #42b9b5;
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.05em;
+.btn-register:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
-.form-obj-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0.5rem 1.5rem;
-}
-
-.form-obj-list li {
-  font-size: 0.95rem;
-  color: #334155;
-  padding-left: 1.2rem;
-  position: relative;
-  line-height: 1.4;
-}
-
-.form-obj-list li::before {
-  content: "→";
-  position: absolute;
-  left: 0;
-  color: #42b9b5;
-  font-weight: bold;
+.btn-register svg {
+  width: 18px;
+  height: 18px;
 }
 
 @media (max-width: 600px) {
@@ -832,11 +833,19 @@ const toggleFormation = (id) => {
   
   .card-header-flex {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
-  
-  .form-obj-list {
-    grid-template-columns: 1fr;
+
+  .card-buttons {
+    margin-top: 1rem;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .btn-download, .btn-register {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>
