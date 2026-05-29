@@ -30,7 +30,7 @@ const onQualiopiError = (e) => {
         </div>
         <ul class="contact-list">
           <li class="contact-address">
-            75 Grande Rue Saint-Cosme<br />71100 Chalon-sur-Saônea
+            75 Grande Rue Saint-Cosme<br />71100 Chalon-sur-Saône
           </li>
           <li>
             <a href="tel:0385421865">• 03 85 42 18 65</a>
