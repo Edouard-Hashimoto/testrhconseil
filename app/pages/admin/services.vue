@@ -107,6 +107,7 @@ const startEdit = (service) => {
       date: f.date || '',
       pdf_url: f.pdf_url || '',
       inscription_url: f.inscription_url || '',
+      discover_url: f.discover_url || '',
       _pdfFile: null,
       objectives: f.objectives ? f.objectives.split('\n').filter(o => o.trim()) : ['']
     })) : []
@@ -133,6 +134,7 @@ const addFormation = (target) => {
     date: '', 
     pdf_url: '', 
     inscription_url: '', 
+    discover_url: '', 
     _pdfFile: null 
   })
 }
@@ -153,6 +155,7 @@ const migrateThemesToFormations = (target) => {
     date: today,
     pdf_url: '',
     inscription_url: '',
+    discover_url: '',
     _pdfFile: null
   }))
   
@@ -379,7 +382,11 @@ const deleteService = async (id) => {
                       <span v-if="form.pdf_url" class="pdf-status">✓ En ligne</span>
                     </div>
                   </div>
-                  <div class="field" style="grid-column: span 2;">
+                  <div class="field">
+                    <label class="label-tiny">Lien de découverte (ex: https://...)</label>
+                    <input v-model="form.discover_url" type="text" placeholder="Entrez le lien du site de découverte..." />
+                  </div>
+                  <div class="field">
                     <label class="label-tiny">Lien d'inscription (ex: https://...)</label>
                     <input v-model="form.inscription_url" type="text" placeholder="Entrez le lien du site d'inscription..." />
                   </div>
@@ -515,7 +522,11 @@ const deleteService = async (id) => {
                                       <span v-if="form.pdf_url" class="pdf-tag">OK</span>
                                     </div>
                                   </div>
-                                  <div class="field" style="grid-column: span 2;">
+                                  <div class="field">
+                                    <span class="label-tiny">Lien de découverte (ex: https://...)</span>
+                                    <input v-model="form.discover_url" type="text" placeholder="Entrez le lien..." class="mini-input" />
+                                  </div>
+                                  <div class="field">
                                     <span class="label-tiny">Lien d'inscription (ex: https://...)</span>
                                     <input v-model="form.inscription_url" type="text" placeholder="Entrez le lien..." class="mini-input" />
                                   </div>

@@ -123,8 +123,8 @@ const toggleFormation = (id) => {
                       <span>Programme PDF</span>
                     </a>
                     <a 
-                      v-if="form.inscription_url" 
-                      :href="form.inscription_url" 
+                      v-if="form.discover_url" 
+                      :href="form.discover_url" 
                       target="_blank" 
                       class="btn-discover"
                       title="Découvrir la formation"
@@ -182,8 +182,8 @@ const toggleFormation = (id) => {
                         <span>Programme PDF</span>
                       </a>
                       <a 
-                        v-if="form.inscription_url" 
-                        :href="form.inscription_url" 
+                        v-if="form.discover_url" 
+                        :href="form.discover_url" 
                         target="_blank" 
                         class="btn-discover"
                         title="Découvrir la formation"
