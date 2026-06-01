@@ -17,7 +17,7 @@ const pdfUrl = '/livret-rhconseil.pdf'
           </svg>
           Document PDF
         </div>
-        <h1 class="livret-hero-title">Livret de présentation<br><strong>RH Conseil 71</strong></h1>
+        <h1 class="livret-hero-title">Livret des prestations et formations<br><strong>RH Conseil 71</strong></h1>
         <p class="livret-hero-sub">Découvrez notre cabinet, nos expertises et notre engagement qualité à travers ce livret.</p>
         <a :href="pdfUrl" download="Livret_RH_Conseil_71.pdf" class="btn-dl">
           <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">

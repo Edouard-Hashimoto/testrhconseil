@@ -126,6 +126,16 @@ const toggleFormation = (id) => {
                       v-if="form.inscription_url" 
                       :href="form.inscription_url" 
                       target="_blank" 
+                      class="btn-discover"
+                      title="Découvrir la formation"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      <span>Découvrir</span>
+                    </a>
+                    <a 
+                      v-if="form.inscription_url" 
+                      :href="form.inscription_url + '#program-sessions-calendar-popup'" 
+                      target="_blank" 
                       class="btn-register"
                       :style="{ background: service.color || '#42b9b5' }"
                     >
@@ -174,6 +184,16 @@ const toggleFormation = (id) => {
                       <a 
                         v-if="form.inscription_url" 
                         :href="form.inscription_url" 
+                        target="_blank" 
+                        class="btn-discover"
+                        title="Découvrir la formation"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <span>Découvrir</span>
+                      </a>
+                      <a 
+                        v-if="form.inscription_url" 
+                        :href="form.inscription_url + '#program-sessions-calendar-popup'" 
                         target="_blank" 
                         class="btn-register"
                         :style="{ background: service.color || '#42b9b5' }"
@@ -763,7 +783,7 @@ const toggleFormation = (id) => {
   margin-top: 1.5rem;
 }
 
-.btn-download {
+.btn-download, .btn-discover {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -779,14 +799,14 @@ const toggleFormation = (id) => {
   flex-shrink: 0;
 }
 
-.btn-download:hover {
+.btn-download:hover, .btn-discover:hover {
   background: #1a1a2e;
   border-color: #1a1a2e;
   color: white;
   transform: translateY(-2px);
 }
 
-.btn-download svg {
+.btn-download svg, .btn-discover svg {
   width: 18px;
   height: 18px;
 }
@@ -843,7 +863,7 @@ const toggleFormation = (id) => {
     width: 100%;
   }
 
-  .btn-download, .btn-register {
+  .btn-download, .btn-discover, .btn-register {
     width: 100%;
     justify-content: center;
   }
