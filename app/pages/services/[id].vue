@@ -92,7 +92,7 @@ const getYoutubeEmbedUrl = (url) => {
           </template>
 
           <!-- Accordion Themes -->
-          <div v-if="service.themes && service.themes.length > 0" class="themes-accordion">
+          <div v-if="Number(service.show_themes) !== 0 && service.themes && service.themes.length > 0" class="themes-accordion">
             <div 
               v-for="theme in service.themes" 
               :key="theme.id" 
@@ -119,7 +119,7 @@ const getYoutubeEmbedUrl = (url) => {
           </div>
 
           <!-- Custom Calendar Layout for Formations -->
-          <div v-if="service.title.toLowerCase().includes('formation') && service.formations && service.formations.length > 0" class="formations-calendar">
+          <div v-if="Number(service.show_formations) !== 0 && service.title.toLowerCase().includes('formation') && service.formations && service.formations.length > 0" class="formations-calendar">
             <h2 class="section-title mt-12">Calendrier des formations</h2>
             <NuxtLink to="/livret" class="catalogue-banner">
               <span class="catalogue-banner-icon">
@@ -181,7 +181,7 @@ const getYoutubeEmbedUrl = (url) => {
           </div>
 
           <!-- Standard Accordion Formations (fallback if not 'Formations' service) -->
-          <div v-else-if="service.formations && service.formations.length > 0" class="formations-section">
+          <div v-else-if="Number(service.show_formations) !== 0 && service.formations && service.formations.length > 0" class="formations-section">
             <h2 class="section-title mt-12">Nos formations</h2>
             <NuxtLink to="/livret" class="catalogue-banner">
               <span class="catalogue-banner-icon">
@@ -247,10 +247,6 @@ const getYoutubeEmbedUrl = (url) => {
               </div>
             </div>
           </div>
-
-          <div v-else-if="!service.description" class="no-description">
-            <p>Détails à venir pour ce service...</p>
-          </div>
           
           <!-- Vidéo de présentation du service -->
           <div v-if="service.video_url && getYoutubeEmbedUrl(service.video_url)" class="service-video-section mt-12">
@@ -270,7 +266,7 @@ const getYoutubeEmbedUrl = (url) => {
 
         <aside class="service-sidebar">
 
-          <div v-if="service.formations && service.formations.length > 0" class="sidebar-catalogue-card">
+          <div v-if="Number(service.show_formations) !== 0 && service.formations && service.formations.length > 0" class="sidebar-catalogue-card">
             <div class="sidebar-catalogue-icon">
               <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
             </div>

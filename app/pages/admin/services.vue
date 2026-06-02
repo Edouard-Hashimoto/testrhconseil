@@ -15,7 +15,7 @@ const refresh = async () => {
   await refreshServices()
 }
 
-const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [], video_url: '' })
+const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [], video_url: '', show_themes: 1, show_formations: 1 })
 const editingId = ref(null)
 const editData = ref({})
 const uploading = ref(false)
@@ -83,7 +83,7 @@ const createService = async (evt) => {
       method: 'POST', 
       body: { ...newService.value, logo, themes: themesToSave, formations: formationsToSave } 
     })
-    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [], video_url: '' }
+    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [], video_url: '', show_themes: 1, show_formations: 1 }
     if (fileInput) fileInput.value = ''
     await refresh()
   } catch (e) {
@@ -98,6 +98,8 @@ const startEdit = (service) => {
   editData.value = { 
     ...service, 
     video_url: service.video_url || '',
+    show_themes: service.show_themes !== undefined ? Number(service.show_themes) : 1,
+    show_formations: service.show_formations !== undefined ? Number(service.show_formations) : 1,
     category_ids: (service.category_ids || []).map(Number),
     themes: service.themes ? service.themes.map(t => ({
       ...t,
@@ -341,6 +343,19 @@ const deleteService = async (id) => {
             <input v-model="newService.video_url" type="text" placeholder="ex: https://www.youtube.com/watch?v=... ou https://youtu.be/..." />
           </div>
           <div class="field basis-full">
+            <label>Visibilité</label>
+            <div class="checkbox-grid" style="display: flex; gap: 2rem;">
+              <label class="checkbox-item" style="cursor: pointer;">
+                <input type="checkbox" v-model="newService.show_themes" :true-value="1" :false-value="0" />
+                <span>Afficher les thématiques / prestations</span>
+              </label>
+              <label class="checkbox-item" style="cursor: pointer;">
+                <input type="checkbox" v-model="newService.show_formations" :true-value="1" :false-value="0" />
+                <span>Afficher les formations</span>
+              </label>
+            </div>
+          </div>
+          <div class="field basis-full">
             <div class="themes-header">
               <label>Thématiques & Objectifs</label>
               <button type="button" @click="addTheme(newService)" class="btn-add-mini">+ Ajouter une thématique</button>
@@ -474,6 +489,19 @@ const deleteService = async (id) => {
                         <div class="field mt-4">
                           <label>Lien de vidéo YouTube</label>
                           <input v-model="editData.video_url" type="text" class="edit-input" placeholder="Lien YouTube..." style="width: 100%;" />
+                        </div>
+                        <div class="field mt-4">
+                          <label>Visibilité</label>
+                          <div class="checkbox-grid-mini" style="display: flex; flex-direction: column; gap: 0.5rem; background: #f8fafc; border: 1.1px solid #e2e8f0; border-radius: 6px; padding: 0.6rem;">
+                            <label class="checkbox-item-mini" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 500; color: #64748b; cursor: pointer;">
+                              <input type="checkbox" v-model="editData.show_themes" :true-value="1" :false-value="0" />
+                              <span>Afficher les thématiques</span>
+                            </label>
+                            <label class="checkbox-item-mini" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-weight: 500; color: #64748b; cursor: pointer;">
+                              <input type="checkbox" v-model="editData.show_formations" :true-value="1" :false-value="0" />
+                              <span>Afficher les formations</span>
+                            </label>
+                          </div>
                         </div>
                         
                         <div class="edit-actions-sidebar mt-8">

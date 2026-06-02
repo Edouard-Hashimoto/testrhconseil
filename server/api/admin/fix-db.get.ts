@@ -42,6 +42,20 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
+      await db.execute("ALTER TABLE services ADD COLUMN show_themes INTEGER DEFAULT 1");
+      logs.push("Colonne 'show_themes' ajoutée avec succès sur services.");
+    } catch (e) {
+      logs.push("Colonne 'show_themes' déjà présente ou erreur ignorée sur services.");
+    }
+
+    try {
+      await db.execute("ALTER TABLE services ADD COLUMN show_formations INTEGER DEFAULT 1");
+      logs.push("Colonne 'show_formations' ajoutée avec succès sur services.");
+    } catch (e) {
+      logs.push("Colonne 'show_formations' déjà présente ou erreur ignorée sur services.");
+    }
+
+    try {
       await db.execute(`
         CREATE TABLE IF NOT EXISTS jobs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
