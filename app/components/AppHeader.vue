@@ -24,7 +24,7 @@
             </ul>
           </li>
           <li><NuxtLink to="/particuliers" class="nav-link">Particuliers</NuxtLink></li>
-          <li><NuxtLink to="/offres-emplois" class="nav-link">Offres d'emplois</NuxtLink></li>
+          <li><NuxtLink to="/offres-emplois" class="nav-link">Offres d'emploi</NuxtLink></li>
           <li><NuxtLink to="/contact" class="nav-link">Contact</NuxtLink></li>
         </ul>
       </nav>
