@@ -15,7 +15,7 @@ const refresh = async () => {
   await refreshServices()
 }
 
-const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [] })
+const newService = ref({ title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [], video_url: '' })
 const editingId = ref(null)
 const editData = ref({})
 const uploading = ref(false)
@@ -75,7 +75,7 @@ const createService = async (evt) => {
       return {
         ...f,
         pdf_url,
-        objectives: ''
+        objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
       }
     }))
     
@@ -83,7 +83,7 @@ const createService = async (evt) => {
       method: 'POST', 
       body: { ...newService.value, logo, themes: themesToSave, formations: formationsToSave } 
     })
-    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [] }
+    newService.value = { title: '', color: '#6b21a8', description: '', category_ids: [], themes: [], formations: [], video_url: '' }
     if (fileInput) fileInput.value = ''
     await refresh()
   } catch (e) {
@@ -97,6 +97,7 @@ const startEdit = (service) => {
   editingId.value = service.id
   editData.value = { 
     ...service, 
+    video_url: service.video_url || '',
     category_ids: (service.category_ids || []).map(Number),
     themes: service.themes ? service.themes.map(t => ({
       ...t,
@@ -199,7 +200,7 @@ const saveEdit = async (evt) => {
       return {
         ...f,
         pdf_url: currentPdf,
-        objectives: ''
+        objectives: Array.isArray(f.objectives) ? f.objectives.filter(o => o.trim()).join('\n') : f.objectives
       }
     }))
     
@@ -264,6 +265,10 @@ const deleteService = async (id) => {
         <NuxtLink to="/admin/statistics" class="nav-item">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
           Statistiques
+        </NuxtLink>
+        <NuxtLink to="/admin/jobs" class="nav-item">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 .621-.504 1.125-1.125 1.125H4.875c-.621 0-1.125-.504-1.125-1.125v-4.25m16.5 0a2.25 2.25 0 00-1.883-2.212c-2.02-.326-4.085-.488-6.117-.488-2.032 0-4.097.162-6.117.488a2.25 2.25 0 00-1.883 2.212m16.5 0V10.5c0-.621-.504-1.125-1.125-1.125h-3.375a1.125 1.125 0 01-1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H11.25c-.621 0-1.125.504-1.125 1.125V8.25c0 .621-.504 1.125-1.125 1.125H5.625c-.621 0-1.125.504-1.125 1.125v3.65m12-8.25v3.75m-3.75-3.75v3.75" /></svg>
+          Offres d'emploi
         </NuxtLink>
 
         <p class="nav-section-label">Outils</p>
@@ -332,6 +337,10 @@ const deleteService = async (id) => {
             <textarea v-model="newService.description" placeholder="Courte introduction avant les thématiques..." rows="2"></textarea>
           </div>
           <div class="field basis-full">
+            <label>Lien de vidéo YouTube (facultatif)</label>
+            <input v-model="newService.video_url" type="text" placeholder="ex: https://www.youtube.com/watch?v=... ou https://youtu.be/..." />
+          </div>
+          <div class="field basis-full">
             <div class="themes-header">
               <label>Thématiques & Objectifs</label>
               <button type="button" @click="addTheme(newService)" class="btn-add-mini">+ Ajouter une thématique</button>
@@ -390,6 +399,15 @@ const deleteService = async (id) => {
                     <label class="label-tiny">Lien d'inscription (ex: https://...)</label>
                     <input v-model="form.inscription_url" type="text" placeholder="Entrez le lien du site d'inscription..." />
                   </div>
+                </div>
+                
+                <div class="objectives-edit-section">
+                  <span class="label-tiny">Objectifs de la formation</span>
+                  <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="objective-field-row">
+                    <input v-model="form.objectives[oIdx]" type="text" placeholder="Saisir un objectif..." class="grow" />
+                    <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
+                  </div>
+                  <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain">+ Ajouter un objectif</button>
                 </div>
 
               </div>
@@ -452,6 +470,10 @@ const deleteService = async (id) => {
                             <img v-if="editData.logo" :src="useAssetUrl(editData.logo, 'logo')" class="logo-thumb" />
                             <input type="file" accept="image/*" class="file-input-sm" />
                           </div>
+                        </div>
+                        <div class="field mt-4">
+                          <label>Lien de vidéo YouTube</label>
+                          <input v-model="editData.video_url" type="text" class="edit-input" placeholder="Lien YouTube..." style="width: 100%;" />
                         </div>
                         
                         <div class="edit-actions-sidebar mt-8">
@@ -530,6 +552,14 @@ const deleteService = async (id) => {
                                     <span class="label-tiny">Lien d'inscription (ex: https://...)</span>
                                     <input v-model="form.inscription_url" type="text" placeholder="Entrez le lien..." class="mini-input" />
                                   </div>
+                                </div>
+                                
+                                <div class="mini-objectives">
+                                  <div v-for="(obj, oIdx) in form.objectives" :key="oIdx" class="mini-objective-row">
+                                    <input v-model="form.objectives[oIdx]" class="mini-input grow" placeholder="Objectif..." />
+                                    <button type="button" @click="removeObjective(form, oIdx)" class="btn-remove-tiny">×</button>
+                                  </div>
+                                  <button type="button" @click="addObjective(form)" class="btn-add-tiny-plain" style="color: #F7A600; border-color: rgba(247, 166, 0, 0.2); background: rgba(247, 166, 0, 0.05)">+ Obj.</button>
                                 </div>
                               </div>
                             </div>

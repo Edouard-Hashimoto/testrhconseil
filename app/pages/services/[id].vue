@@ -31,6 +31,30 @@ const openFormationId = ref(null)
 const toggleFormation = (id) => {
   openFormationId.value = openFormationId.value === id ? null : id
 }
+
+const getYoutubeEmbedUrl = (url) => {
+  if (!url) return null
+  if (url.includes('youtube.com/embed/')) return url
+  
+  let videoId = ''
+  if (url.includes('youtube.com/watch')) {
+    const parts = url.split('v=')
+    if (parts.length > 1) {
+      videoId = parts[1].split('&')[0]
+    }
+  } else if (url.includes('youtu.be/')) {
+    const parts = url.split('youtu.be/')
+    if (parts.length > 1) {
+      videoId = parts[1].split('?')[0]
+    }
+  }
+  
+  if (videoId) {
+    return `https://www.youtube.com/embed/${videoId}`
+  }
+  
+  return url
+}
 </script>
 
 <template>
@@ -117,6 +141,14 @@ const toggleFormation = (id) => {
                 </div>
                 <div class="calendar-content-card">
                   <h3 class="form-title">{{ form.title }}</h3>
+                  <div v-if="form.objectives && form.objectives.trim()" class="formation-objectives-section" style="margin-top: 1rem;">
+                    <div class="objectives-label" style="color: #42b9b5;">Les objectifs</div>
+                    <ul class="objectives-list">
+                      <li v-for="(line, lidx) in form.objectives.split('\n').filter(l => l.trim())" :key="lidx" class="li-formation">
+                        {{ line }}
+                      </li>
+                    </ul>
+                  </div>
                   <div class="card-buttons">
                     <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" class="btn-download" title="Télécharger le programme PDF">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
@@ -176,6 +208,14 @@ const toggleFormation = (id) => {
                 </button>
                 <div class="theme-body">
                   <div class="theme-body-inner">
+                    <div v-if="form.objectives && form.objectives.trim()" class="formation-objectives-section" style="margin-bottom: 1.25rem;">
+                      <div class="objectives-label" style="color: #42b9b5;">Les objectifs</div>
+                      <ul class="objectives-list">
+                        <li v-for="(line, lidx) in form.objectives.split('\n').filter(l => l.trim())" :key="lidx" class="li-formation">
+                          {{ line }}
+                        </li>
+                      </ul>
+                    </div>
                     <div class="card-buttons" style="margin-top: 0;">
                       <a v-if="form.pdf_url" :href="form.pdf_url" target="_blank" class="btn-download" title="Télécharger le programme PDF">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
@@ -211,6 +251,21 @@ const toggleFormation = (id) => {
           <div v-else-if="!service.description" class="no-description">
             <p>Détails à venir pour ce service...</p>
           </div>
+          
+          <!-- Vidéo de présentation du service -->
+          <div v-if="service.video_url && getYoutubeEmbedUrl(service.video_url)" class="service-video-section mt-12">
+            <h2 class="section-title">Présentation vidéo</h2>
+            <div class="video-container">
+              <iframe
+                :src="getYoutubeEmbedUrl(service.video_url)"
+                title="Présentation vidéo"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
         </div>
 
         <aside class="service-sidebar">
@@ -228,6 +283,17 @@ const toggleFormation = (id) => {
             <h3>Besoin d'accompagnement ?</h3>
             <p>Notre équipe d'experts est à votre écoute pour répondre à vos besoins spécifiques.</p>
             <NuxtLink to="/contact" class="btn-contact" :style="{ background: service.color }">Contactez-nous</NuxtLink>
+          </div>
+
+          <div class="jobs-card">
+            <div class="jobs-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>
+              </svg>
+            </div>
+            <h3>Offres d'emploi</h3>
+            <p>Consultez nos opportunités de carrière et offres d'emploi disponibles.</p>
+            <NuxtLink to="/offres-emplois" class="btn-jobs">Voir les offres →</NuxtLink>
           </div>
         </aside>
       </div>
@@ -867,5 +933,78 @@ const toggleFormation = (id) => {
     width: 100%;
     justify-content: center;
   }
+}
+
+.service-video-section {
+  margin-top: 3.5rem;
+}
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  height: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.jobs-card {
+  background: #fff;
+  padding: 1.75rem;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.jobs-card:hover {
+  border-color: rgb(102, 45, 98);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(102, 45, 98, 0.08);
+}
+.jobs-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(102, 45, 98, 0.1);
+  border-radius: 12px;
+  color: rgb(102, 45, 98);
+  margin-bottom: 1rem;
+}
+.jobs-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 0.75rem;
+}
+.jobs-card p {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 1.25rem;
+  line-height: 1.5;
+}
+.btn-jobs {
+  display: block;
+  padding: 0.75rem;
+  background: rgb(102, 45, 98);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-jobs:hover {
+  background: rgb(82, 35, 78);
+  transform: translateY(-2px);
 }
 </style>

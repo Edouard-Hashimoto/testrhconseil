@@ -48,6 +48,7 @@ export const initDb = async () => {
       logo TEXT,
       description TEXT,
       category_id INTEGER,
+      video_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE TABLE IF NOT EXISTS settings (
@@ -121,6 +122,13 @@ export const initDb = async () => {
       inscription_url TEXT,
       discover_url TEXT,
       FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS jobs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      link TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`
   ], "write");
 
@@ -129,6 +137,18 @@ export const initDb = async () => {
   try { await db.execute(`ALTER TABLE service_formations ADD COLUMN pdf_url TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE service_formations ADD COLUMN inscription_url TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE service_formations ADD COLUMN discover_url TEXT`); } catch(e) {}
+  try { await db.execute(`ALTER TABLE services ADD COLUMN video_url TEXT`); } catch(e) {}
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS jobs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        link TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  } catch(e) {}
 
   // Migration des données existantes vers la table de jointure
   await db.execute(`

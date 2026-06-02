@@ -12,13 +12,14 @@ export default defineEventHandler(async (event) => {
   
   // 1. Insertion du service
   const res = await db.execute({ 
-    sql: 'INSERT INTO services (title, color, logo, description, category_id) VALUES (?, ?, ?, ?, ?)', 
+    sql: 'INSERT INTO services (title, color, logo, description, category_id, video_url) VALUES (?, ?, ?, ?, ?, ?)', 
     args: [
       body.title, 
       body.color || '#6b21a8', 
       body.logo || null, 
       body.description || null, 
-      (body.category_ids && body.category_ids.length > 0) ? body.category_ids[0] : null // Keep legacy column for now
+      (body.category_ids && body.category_ids.length > 0) ? body.category_ids[0] : null, // Keep legacy column for now
+      body.video_url || null
     ] 
   });
 

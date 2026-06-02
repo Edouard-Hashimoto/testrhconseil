@@ -34,6 +34,28 @@ export default defineEventHandler(async (event) => {
       logs.push("Colonne 'discover_url' déjà présente ou erreur ignorée.");
     }
 
+    try {
+      await db.execute("ALTER TABLE services ADD COLUMN video_url TEXT");
+      logs.push("Colonne 'video_url' ajoutée avec succès sur services.");
+    } catch (e) {
+      logs.push("Colonne 'video_url' déjà présente ou erreur ignorée sur services.");
+    }
+
+    try {
+      await db.execute(`
+        CREATE TABLE IF NOT EXISTS jobs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT NOT NULL,
+          description TEXT NOT NULL,
+          link TEXT NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      logs.push("Table 'jobs' vérifiée/créée avec succès.");
+    } catch (e) {
+      logs.push("Table 'jobs' déjà présente ou erreur ignorée.");
+    }
+
     return { success: true, logs };
   } catch (err: any) {
     return { success: false, error: err.message, logs };

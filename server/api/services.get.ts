@@ -42,7 +42,9 @@ export default defineEventHandler(async () => {
         title: row.title,
         objectives: row.objectives,
         date: row.date,
-        pdf_url: row.pdf_url
+        pdf_url: row.pdf_url,
+        inscription_url: row.inscription_url,
+        discover_url: row.discover_url
       });
     }
 

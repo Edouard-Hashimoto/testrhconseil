@@ -9,13 +9,14 @@ export default defineEventHandler(async (event) => {
 
   // 1. Mise à jour du service (on garde category_id pour la compatibilité)
   await db.execute({ 
-    sql: 'UPDATE services SET title = ?, color = ?, logo = ?, description = ?, category_id = ? WHERE id = ?', 
+    sql: 'UPDATE services SET title = ?, color = ?, logo = ?, description = ?, category_id = ?, video_url = ? WHERE id = ?', 
     args: [
       body.title, 
       body.color, 
       body.logo ?? null, 
       body.description ?? null, 
       (body.category_ids && body.category_ids.length > 0) ? body.category_ids[0] : null,
+      body.video_url ?? null,
       serviceId
     ] 
   });

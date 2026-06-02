@@ -115,15 +115,7 @@ onMounted(() => {
                 />
               </NuxtLink>
             </template>
-            <NuxtLink
-              to="/livret"
-              class="service-card livret-card"
-            >
-              <span class="service-title">Livret de présentation</span>
-              <svg class="service-logo livret-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-              </svg>
-            </NuxtLink>
+
             <div v-if="!services || services.length === 0" class="service-empty">
               Aucun service configuré.<br />
               <NuxtLink to="/admin/services" class="text-white underline text-sm">Configurer →</NuxtLink>
@@ -660,25 +652,7 @@ onMounted(() => {
   transform: rotate(-5deg);
 }
 
-.livret-card {
-  background-color: #1a1a2e;
-  color: #fff;
-}
 
-.livret-card:hover {
-  background-color: #24243e;
-}
-
-.livret-icon {
-  color: #fff;
-  opacity: 0.15;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.livret-card:hover .livret-icon {
-  opacity: 0.25;
-  transform: rotate(-10deg) scale(1.05);
-}
 
 .service-empty {
   grid-column: 1 / -1;

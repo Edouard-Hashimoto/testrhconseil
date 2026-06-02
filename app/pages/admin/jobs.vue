@@ -1,41 +1,27 @@
 <script setup>
 definePageMeta({ middleware: 'auth' })
 
-const { data: statistics, refresh } = await useFetch('/api/statistics')
+const { data: jobs, refresh } = await useFetch('/api/jobs')
 const isSending = ref(false)
-const imageFile = ref(null)
-const fileInput = ref(null)
 
-const newStat = ref({ title: '', text: '' })
+const newJob = ref({ title: '', description: '', link: '' })
 const editingId = ref(null)
-const editData = ref({ title: '', text: '', image: '' })
+const editData = ref({ title: '', description: '', link: '' })
 
-const handleFileChange = (e) => {
-  imageFile.value = e.target.files[0]
-}
-
-const addStat = async () => {
-  if (!newStat.value.title || !newStat.value.text) return
+const addJob = async () => {
+  if (!newJob.value.title || !newJob.value.description || !newJob.value.link) return
   isSending.value = true
 
   try {
-    let imageUrl = null
-
-    // Upload image separately if present
-    if (imageFile.value) {
-      const imageFormData = new FormData()
-      imageFormData.append('file', imageFile.value)
-      const uploadResult = await $fetch('/api/upload-news-image', { method: 'POST', body: imageFormData })
-      imageUrl = uploadResult.url
-    }
-
-    await $fetch('/api/statistics', {
+    await $fetch('/api/jobs', {
       method: 'POST',
-      body: { title: newStat.value.title, text: newStat.value.text, imageUrl }
+      body: { 
+        title: newJob.value.title, 
+        description: newJob.value.description, 
+        link: newJob.value.link 
+      }
     })
-    newStat.value = { title: '', text: '' }
-    imageFile.value = null
-    if (fileInput.value) fileInput.value.value = ''
+    newJob.value = { title: '', description: '', link: '' }
     await refresh()
   } catch (e) {
     alert("Erreur lors de l'ajout")
@@ -44,31 +30,25 @@ const addStat = async () => {
   }
 }
 
-const startEdit = (stat) => {
-  editingId.value = stat.id
-  editData.value = { ...stat }
+const startEdit = (job) => {
+  editingId.value = job.id
+  editData.value = { ...job }
 }
 
 const saveEdit = async () => {
-  if (!editData.value.title || !editData.value.text) return
+  if (!editData.value.title || !editData.value.description || !editData.value.link) return
   isSending.value = true
 
   try {
-    let imageUrl = editData.value.image || null
-
-    if (imageFile.value) {
-      const imageFormData = new FormData()
-      imageFormData.append('file', imageFile.value)
-      const uploadResult = await $fetch('/api/upload-news-image', { method: 'POST', body: imageFormData })
-      imageUrl = uploadResult.url
-    }
-
-    await $fetch(`/api/statistics?id=${editingId.value}`, {
+    await $fetch(`/api/jobs?id=${editingId.value}`, {
       method: 'PUT',
-      body: { title: editData.value.title, text: editData.value.text, imageUrl }
+      body: { 
+        title: editData.value.title, 
+        description: editData.value.description, 
+        link: editData.value.link 
+      }
     })
     editingId.value = null
-    imageFile.value = null
     await refresh()
   } catch (e) {
     alert("Erreur lors de la modification")
@@ -77,10 +57,10 @@ const saveEdit = async () => {
   }
 }
 
-const deleteStat = async (id) => {
-  if (!confirm('Supprimer cette statistique ?')) return
+const deleteJob = async (id) => {
+  if (!confirm('Supprimer cette offre d\'emploi ?')) return
   try {
-    await $fetch(`/api/statistics?id=${id}`, { method: 'DELETE' })
+    await $fetch(`/api/jobs?id=${id}`, { method: 'DELETE' })
     await refresh()
   } catch (e) {
     alert("Erreur lors de la suppression")
@@ -130,11 +110,11 @@ const handleLogout = async () => {
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
           Équipe
         </NuxtLink>
-        <NuxtLink to="/admin/statistics" class="nav-item active">
+        <NuxtLink to="/admin/statistics" class="nav-item">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
           Statistiques
         </NuxtLink>
-        <NuxtLink to="/admin/jobs" class="nav-item">
+        <NuxtLink to="/admin/jobs" class="nav-item active">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 .621-.504 1.125-1.125 1.125H4.875c-.621 0-1.125-.504-1.125-1.125v-4.25m16.5 0a2.25 2.25 0 00-1.883-2.212c-2.02-.326-4.085-.488-6.117-.488-2.032 0-4.097.162-6.117.488a2.25 2.25 0 00-1.883 2.212m16.5 0V10.5c0-.621-.504-1.125-1.125-1.125h-3.375a1.125 1.125 0 01-1.125-1.125V4.875c0-.621-.504-1.125-1.125-1.125H11.25c-.621 0-1.125.504-1.125 1.125V8.25c0 .621-.504 1.125-1.125 1.125H5.625c-.621 0-1.125.504-1.125 1.125v3.65m12-8.25v3.75m-3.75-3.75v3.75" /></svg>
           Offres d'emploi
         </NuxtLink>
@@ -159,13 +139,13 @@ const handleLogout = async () => {
     <div class="main-content">
       <header class="page-header">
         <div>
-          <h1 class="page-title">Statistiques</h1>
-          <p class="page-desc">Gérez les statistiques affichées sur le site</p>
+          <h1 class="page-title">Offres d'emploi</h1>
+          <p class="page-desc">Gérez les offres d'emploi affichées sur le site</p>
         </div>
         <div class="header-stats">
           <div class="stat-pill">
-            <span class="stat-value">{{ statistics?.length ?? 0 }}</span>
-            <span class="stat-label">statistique(s)</span>
+            <span class="stat-value">{{ jobs?.length ?? 0 }}</span>
+            <span class="stat-label">offre(s)</span>
           </div>
         </div>
       </header>
@@ -173,25 +153,25 @@ const handleLogout = async () => {
       <section class="card">
         <h2 class="card-title">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-          {{ editingId ? 'Modifier la statistique' : 'Nouvelle statistique' }}
+          {{ editingId ? 'Modifier l\'offre d\'emploi' : 'Nouvelle offre d\'emploi' }}
         </h2>
-        <form @submit.prevent="editingId ? saveEdit() : addStat()" class="form-grid">
-          <div class="field">
-            <label>Titre</label>
-            <input v-model="(editingId ? editData : newStat).title" type="text" placeholder="Titre (ex: Statistiques 2024-2025)" required />
-          </div>
-          <div class="field">
-            <label>Image de fond</label>
-            <input @change="handleFileChange" type="file" accept="image/*" ref="fileInput" />
+        <form @submit.prevent="editingId ? saveEdit() : addJob()" class="form-grid">
+          <div class="field span-full">
+            <label>Titre de l'offre</label>
+            <input v-model="(editingId ? editData : newJob).title" type="text" placeholder="ex: Technicien de Maintenance (H/F)" required />
           </div>
           <div class="field span-full">
-            <label>Texte / Valeurs</label>
-            <RichEditor v-model="(editingId ? editData : newStat).text" />
+            <label>Lien de l'offre (redirection externe)</label>
+            <input v-model="(editingId ? editData : newJob).link" type="text" placeholder="ex: https://www.lindustrie-recrute.fr/offre/..." required />
+          </div>
+          <div class="field span-full">
+            <label>Description courte</label>
+            <textarea v-model="(editingId ? editData : newJob).description" placeholder="Description de l'offre et compétences recherchées..." rows="4" required></textarea>
           </div>
           <div class="span-full">
             <button type="submit" :disabled="isSending" class="btn-primary">
               <span v-if="isSending" class="spinner"></span>
-              {{ isSending ? 'Enregistrement...' : (editingId ? 'Mettre à jour' : 'Ajouter la statistique') }}
+              {{ isSending ? 'Enregistrement...' : (editingId ? 'Mettre à jour' : 'Ajouter l\'offre') }}
             </button>
             <button v-if="editingId" type="button" @click="editingId = null" class="btn-cancel" style="margin-left: 1rem;">Annuler</button>
           </div>
@@ -201,25 +181,23 @@ const handleLogout = async () => {
       <section class="card">
         <h2 class="card-title">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-          Liste des statistiques
+          Liste des offres
         </h2>
-        <div v-if="!statistics || statistics.length === 0" class="empty-state">
-          Aucune statistique enregistrée.
+        <div v-if="!jobs || jobs.length === 0" class="empty-state">
+          Aucune offre d'emploi enregistrée.
         </div>
         <div v-else class="list-container">
-          <div v-for="item in statistics" :key="item.id" class="list-item">
-            <div class="item-img" v-if="item.image">
-              <img :src="useAssetUrl(item.image, 'stats')" alt="Stat" />
-            </div>
+          <div v-for="item in jobs" :key="item.id" class="list-item">
             <div class="item-info">
               <p class="item-title">{{ item.title }}</p>
-              <p class="item-text" v-html="item.text"></p>
+              <p class="item-text" style="-webkit-line-clamp: 3; line-clamp: 3; max-height: 5.4em;">{{ item.description }}</p>
+              <a :href="item.link" target="_blank" class="item-link">{{ item.link }}</a>
             </div>
             <div class="item-actions">
               <button @click="startEdit(item)" class="btn-edit-tool" title="Modifier">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
               </button>
-              <button @click="deleteStat(item.id)" class="btn-delete" title="Supprimer">
+              <button @click="deleteJob(item.id)" class="btn-delete" title="Supprimer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
               </button>
             </div>
@@ -256,7 +234,7 @@ const handleLogout = async () => {
 .card { background: #fff; border-radius: 16px; padding: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
 .card-title { display: flex; align-items: center; gap: 0.5rem; font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 1.25rem; }
 .card-title svg { width: 18px; height: 18px; flex-shrink: 0; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
 .span-full { grid-column: 1 / -1; }
 .field label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.4rem; }
 .field input, .field textarea { width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; color: #1e293b; background: #f8fafc; outline: none; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; }
@@ -267,13 +245,12 @@ const handleLogout = async () => {
 .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .list-container { display: flex; flex-direction: column; gap: 0.75rem; }
-.list-item { display: flex; align-items: center; gap: 1.25rem; padding: 1rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
-.item-img { width: 80px; height: 80px; border-radius: 10px; overflow: hidden; flex-shrink: 0; border: 1px solid #e2e8f0; background: #fff; display: flex; align-items: center; justify-content: center; }
-.item-img img { width: 100%; height: 100%; object-fit: contain; }
+.list-item { display: flex; align-items: center; gap: 1.25rem; padding: 1.25rem; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; }
 .item-info { flex: 1; min-width: 0; }
-.item-title { font-weight: 700; color: #1e293b; margin: 0 0 0.3rem; font-size: 1.05rem; }
-.item-text { font-size: 0.875rem; color: #64748b; margin: 0; line-height: 1.5; max-height: 3.6em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-clamp: 2; }
-.item-text :deep(p) { margin: 0; }
+.item-title { font-weight: 700; color: #1e293b; margin: 0 0 0.4rem; font-size: 1.05rem; }
+.item-text { font-size: 0.875rem; color: #64748b; margin: 0 0 0.5rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; }
+.item-link { font-size: 0.75rem; color: #e91e8c; text-decoration: none; word-break: break-all; font-weight: 600; }
+.item-link:hover { text-decoration: underline; }
 .item-actions { display: flex; gap: 0.5rem; }
 .btn-edit-tool { padding: 0.5rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; color: #2563eb; cursor: pointer; transition: all 0.2s; }
 .btn-edit-tool:hover { background: #dbeafe; }
