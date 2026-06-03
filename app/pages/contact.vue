@@ -38,6 +38,19 @@
 
         <div class="contact-map-section">
           <div id="map" class="leaflet-map-container"></div>
+          <div class="parking-notice">
+            <div class="parking-notice-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                <path d="M13 3H6v18h4v-6h3c3.31 0 6-2.69 6-6s-2.69-6-6-6zm.2 8H10V7h3.2c1.1 0 2 .9 2 2s-.9 2-2 2z"/>
+              </svg>
+            </div>
+            <div class="parking-notice-body">
+              <strong class="parking-notice-title">Accès à nos locaux</strong>
+              <p class="parking-notice-text">
+                Nos locaux sont situés en <strong>zone bleue</strong> — pensez à prévoir un <strong>disque de stationnement</strong>. Nous ne disposons pas de parking dédié.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -263,7 +276,9 @@ textarea {
 
 .contact-map-section {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: stretch;
 }
 
 .leaflet-map-container {
@@ -273,6 +288,56 @@ textarea {
   overflow: hidden;
   box-shadow: 0 15px 45px rgba(0,0,0,0.06);
   z-index: 10;
+}
+
+/* Parking Notice */
+.parking-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: #e8f4fd;
+  border: 1px solid #b3d7f0;
+  border-left: 4px solid #2196F3;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+.parking-notice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: #2196F3;
+  border-radius: 10px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.parking-notice-body {
+  flex: 1;
+}
+
+.parking-notice-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1565C0;
+  margin-bottom: 0.4rem;
+}
+
+.parking-notice-text {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+.parking-notice-text strong {
+  color: #1565C0;
 }
 
 @media (max-width: 1000px) {
