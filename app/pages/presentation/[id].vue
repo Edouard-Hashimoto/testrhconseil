@@ -136,4 +136,20 @@ useHead({
     margin: 0 auto;
   }
 }
+
+@media (max-width: 768px) {
+  .member-detail-page {
+    padding: 6rem 1.5rem 4rem;
+  }
+
+  .back-link {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .member-detail-page {
+    padding: 5.5rem 1rem 3rem;
+  }
+}
 </style>
