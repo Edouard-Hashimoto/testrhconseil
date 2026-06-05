@@ -39,7 +39,7 @@ useHead({
         
         <div class="btn-apply-container">
           <a :href="job.link" target="_blank" rel="noopener" class="btn-apply">
-            Postuler à cette offre
+            Contacter
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
           </a>
         </div>
@@ -101,11 +101,14 @@ useHead({
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  width: 200px;
+  height: 200px;
+  box-sizing: border-box;
 }
 
 .job-logo {
-  max-height: 80px;
-  max-width: 180px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -173,11 +176,11 @@ useHead({
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.9rem 2.5rem;
+  padding: 0.65rem 1.75rem;
   background-color: #e91e8c;
   color: #ffffff;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   border-radius: 50px;
   text-decoration: none;
   transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s;

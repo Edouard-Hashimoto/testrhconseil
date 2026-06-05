@@ -6,11 +6,6 @@ useHead({
 
 // Fetch jobs dynamically from our API
 const { data: jobs } = await useFetch('/api/jobs')
-
-const stripHtml = (html) => {
-  if (!html) return ''
-  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
-}
 </script>
 
 <template>
@@ -44,7 +39,6 @@ const stripHtml = (html) => {
               <img :src="useAssetUrl(job.logo, 'logo')" alt="Logo entreprise" class="job-logo" />
             </div>
             <h3 class="job-card-title">{{ job.title }}</h3>
-            <p class="job-card-description">{{ stripHtml(job.description) }}</p>
           </div>
           <div class="job-card-footer">
             <NuxtLink :to="`/offres-emplois/${job.id}`" class="job-card-link">
@@ -130,17 +124,6 @@ const stripHtml = (html) => {
   color: #1a1a2e;
   margin-bottom: 1rem;
   line-height: 1.3;
-}
-
-.job-card-description {
-  font-size: 0.92rem;
-  line-height: 1.6;
-  color: var(--color-text-light);
-  margin-bottom: 1.5rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .job-card-footer {
@@ -285,14 +268,17 @@ const stripHtml = (html) => {
 
 .job-logo-wrapper {
   margin-bottom: 1.25rem;
-  height: 75px;
+  height: 180px;
+  width: 100%;
+  justify-content: center;
   display: flex;
   align-items: center;
 }
 
 .job-logo {
   max-height: 100%;
-  max-width: 150px;
+  width: 100%;
   object-fit: contain;
+  object-position: left;
 }
 </style>
