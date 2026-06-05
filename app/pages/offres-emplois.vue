@@ -35,6 +35,9 @@ const { data: jobs } = await useFetch('/api/jobs')
       <div v-if="jobs && jobs.length > 0" class="jobs-grid">
         <div v-for="job in jobs" :key="job.id" class="job-card">
           <div class="job-card-content">
+            <div v-if="job.logo" class="job-logo-wrapper">
+              <img :src="useAssetUrl(job.logo, 'logo')" alt="Logo entreprise" class="job-logo" />
+            </div>
             <h3 class="job-card-title">{{ job.title }}</h3>
             <p class="job-card-description">{{ job.description }}</p>
           </div>
@@ -273,5 +276,18 @@ const { data: jobs } = await useFetch('/api/jobs')
   .jobs-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.job-logo-wrapper {
+  margin-bottom: 1.25rem;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.job-logo {
+  max-height: 100%;
+  max-width: 120px;
+  object-fit: contain;
 }
 </style>

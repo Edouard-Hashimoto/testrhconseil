@@ -130,6 +130,7 @@ export const initDb = async () => {
       title TEXT NOT NULL,
       description TEXT NOT NULL,
       link TEXT NOT NULL,
+      logo TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`
   ], "write");
@@ -142,6 +143,7 @@ export const initDb = async () => {
   try { await db.execute(`ALTER TABLE services ADD COLUMN video_url TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE services ADD COLUMN show_themes INTEGER DEFAULT 1`); } catch(e) {}
   try { await db.execute(`ALTER TABLE services ADD COLUMN show_formations INTEGER DEFAULT 1`); } catch(e) {}
+  try { await db.execute(`ALTER TABLE jobs ADD COLUMN logo TEXT`); } catch(e) {}
   try {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS jobs (
@@ -149,6 +151,7 @@ export const initDb = async () => {
         title TEXT NOT NULL,
         description TEXT NOT NULL,
         link TEXT NOT NULL,
+        logo TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);

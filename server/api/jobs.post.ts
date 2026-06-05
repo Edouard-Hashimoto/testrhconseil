@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
 
   const body = await readBody(event);
-  const { title, description, link } = body || {};
+  const { title, description, link, logo } = body || {};
 
   if (!title || !description || !link) {
     throw createError({
@@ -16,8 +16,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const res = await db.execute({
-    sql: 'INSERT INTO jobs (title, description, link) VALUES (?, ?, ?)',
-    args: [title, description, link],
+    sql: 'INSERT INTO jobs (title, description, link, logo) VALUES (?, ?, ?, ?)',
+    args: [title, description, link, logo || null],
   });
 
   return {

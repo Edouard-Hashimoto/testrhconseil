@@ -3,25 +3,80 @@ definePageMeta({ middleware: 'auth' })
 
 const { data: jobs, refresh } = await useFetch('/api/jobs')
 const isSending = ref(false)
+const uploading = ref(false)
 
-const newJob = ref({ title: '', description: '', link: '' })
+const newJob = ref({ title: '', description: '', link: '', logo: '' })
 const editingId = ref(null)
-const editData = ref({ title: '', description: '', link: '' })
+const editData = ref({ title: '', description: '', link: '', logo: '' })
+
+const selectedFile = ref(null)
+const logoPreviewUrl = ref(null)
+const logoInput = ref(null)
+
+const onLogoChange = (event) => {
+  const file = event.target.files?.[0]
+  if (file) {
+    selectedFile.value = file
+    logoPreviewUrl.value = URL.createObjectURL(file)
+  }
+}
+
+const removeLogo = () => {
+  if (editingId.value) {
+    editData.value.logo = ''
+  } else {
+    newJob.value.logo = ''
+  }
+  selectedFile.value = null
+  logoPreviewUrl.value = null
+  if (logoInput.value) {
+    logoInput.value.value = ''
+  }
+}
+
+const resetForm = () => {
+  newJob.value = { title: '', description: '', link: '', logo: '' }
+  editData.value = { title: '', description: '', link: '', logo: '' }
+  selectedFile.value = null
+  logoPreviewUrl.value = null
+  if (logoInput.value) {
+    logoInput.value.value = ''
+  }
+}
+
+const uploadLogo = async (file) => {
+  if (!file) return null
+  uploading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await $fetch('/api/upload-job-logo', { method: 'POST', body: form })
+    return res.filename
+  } finally {
+    uploading.value = false
+  }
+}
 
 const addJob = async () => {
   if (!newJob.value.title || !newJob.value.description || !newJob.value.link) return
   isSending.value = true
 
   try {
+    let logoUrl = ''
+    if (selectedFile.value) {
+      logoUrl = await uploadLogo(selectedFile.value)
+    }
+
     await $fetch('/api/jobs', {
       method: 'POST',
       body: { 
         title: newJob.value.title, 
         description: newJob.value.description, 
-        link: newJob.value.link 
+        link: newJob.value.link,
+        logo: logoUrl
       }
     })
-    newJob.value = { title: '', description: '', link: '' }
+    resetForm()
     await refresh()
   } catch (e) {
     alert("Erreur lors de l'ajout")
@@ -33,6 +88,11 @@ const addJob = async () => {
 const startEdit = (job) => {
   editingId.value = job.id
   editData.value = { ...job }
+  selectedFile.value = null
+  logoPreviewUrl.value = null
+  if (logoInput.value) {
+    logoInput.value.value = ''
+  }
 }
 
 const saveEdit = async () => {
@@ -40,15 +100,22 @@ const saveEdit = async () => {
   isSending.value = true
 
   try {
+    let logoUrl = editData.value.logo
+    if (selectedFile.value) {
+      logoUrl = await uploadLogo(selectedFile.value)
+    }
+
     await $fetch(`/api/jobs?id=${editingId.value}`, {
       method: 'PUT',
       body: { 
         title: editData.value.title, 
         description: editData.value.description, 
-        link: editData.value.link 
+        link: editData.value.link,
+        logo: logoUrl
       }
     })
     editingId.value = null
+    resetForm()
     await refresh()
   } catch (e) {
     alert("Erreur lors de la modification")
@@ -168,10 +235,22 @@ const handleLogout = async () => {
             <label>Description courte</label>
             <textarea v-model="(editingId ? editData : newJob).description" placeholder="Description de l'offre et compétences recherchées..." rows="4" required></textarea>
           </div>
+          <div class="field span-full">
+            <label>Logo de l'entreprise (optionnel)</label>
+            <div class="logo-upload-box">
+              <div v-if="logoPreviewUrl || (editingId ? editData : newJob).logo" class="logo-preview-wrapper mb-2">
+                <img :src="logoPreviewUrl || useAssetUrl((editingId ? editData : newJob).logo, 'logo')" class="logo-preview-img" />
+                <button type="button" @click="removeLogo" class="btn-remove-logo" title="Supprimer le logo">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              <input type="file" ref="logoInput" accept="image/*" @change="onLogoChange" class="file-input" />
+            </div>
+          </div>
           <div class="span-full">
-            <button type="submit" :disabled="isSending" class="btn-primary">
-              <span v-if="isSending" class="spinner"></span>
-              {{ isSending ? 'Enregistrement...' : (editingId ? 'Mettre à jour' : 'Ajouter l\'offre') }}
+            <button type="submit" :disabled="isSending || uploading" class="btn-primary">
+              <span v-if="isSending || uploading" class="spinner"></span>
+              {{ (isSending || uploading) ? 'Enregistrement...' : (editingId ? 'Mettre à jour' : 'Ajouter l\'offre') }}
             </button>
             <button v-if="editingId" type="button" @click="editingId = null" class="btn-cancel" style="margin-left: 1rem;">Annuler</button>
           </div>
@@ -188,6 +267,9 @@ const handleLogout = async () => {
         </div>
         <div v-else class="list-container">
           <div v-for="item in jobs" :key="item.id" class="list-item">
+            <div v-if="item.logo" class="item-logo-container">
+              <img :src="useAssetUrl(item.logo, 'logo')" alt="Logo" class="item-logo" />
+            </div>
             <div class="item-info">
               <p class="item-title">{{ item.title }}</p>
               <p class="item-text" style="-webkit-line-clamp: 3; line-clamp: 3; max-height: 5.4em;">{{ item.description }}</p>
@@ -258,4 +340,12 @@ const handleLogout = async () => {
 .btn-delete:hover { background: #fee2e2; }
 .btn-cancel { background: none; border: none; color: #94a3b8; font-weight: 600; cursor: pointer; }
 .empty-state { padding: 3rem; text-align: center; color: #94a3b8; font-size: 0.9rem; }
+.logo-upload-box { display: flex; flex-direction: column; gap: 0.5rem; }
+.logo-preview-wrapper { position: relative; width: 80px; height: 80px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.25rem; display: flex; align-items: center; justify-content: center; }
+.logo-preview-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.btn-remove-logo { position: absolute; top: -8px; right: -8px; background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 0; }
+.btn-remove-logo:hover { background: #dc2626; }
+.item-logo-container { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.25rem; flex-shrink: 0; }
+.item-logo { max-width: 100%; max-height: 100%; object-fit: contain; }
+.mb-2 { margin-bottom: 0.5rem; }
 </style>

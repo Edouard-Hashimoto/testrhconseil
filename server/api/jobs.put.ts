@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const { title, description, link } = body || {};
+  const { title, description, link, logo } = body || {};
 
   if (!title || !description || !link) {
     throw createError({
@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
   }
 
   await db.execute({
-    sql: 'UPDATE jobs SET title = ?, description = ?, link = ? WHERE id = ?',
-    args: [title, description, link, id as string],
+    sql: 'UPDATE jobs SET title = ?, description = ?, link = ?, logo = ? WHERE id = ?',
+    args: [title, description, link, logo || null, id as string],
   });
 
   return { success: true };
