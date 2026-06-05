@@ -1,6 +1,11 @@
 <script setup>
 definePageMeta({ middleware: 'auth' })
 
+const stripHtml = (html) => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 const { data: jobs, refresh } = await useFetch('/api/jobs')
 const isSending = ref(false)
 const uploading = ref(false)
@@ -233,7 +238,7 @@ const handleLogout = async () => {
           </div>
           <div class="field span-full">
             <label>Description courte</label>
-            <textarea v-model="(editingId ? editData : newJob).description" placeholder="Description de l'offre et compétences recherchées..." rows="4" required></textarea>
+            <RichEditor v-model="(editingId ? editData : newJob).description" />
           </div>
           <div class="field span-full">
             <label>Logo de l'entreprise (optionnel)</label>
@@ -272,7 +277,7 @@ const handleLogout = async () => {
             </div>
             <div class="item-info">
               <p class="item-title">{{ item.title }}</p>
-              <p class="item-text" style="-webkit-line-clamp: 3; line-clamp: 3; max-height: 5.4em;">{{ item.description }}</p>
+              <p class="item-text" style="-webkit-line-clamp: 3; line-clamp: 3; max-height: 5.4em;">{{ stripHtml(item.description) }}</p>
               <a :href="item.link" target="_blank" class="item-link">{{ item.link }}</a>
             </div>
             <div class="item-actions">

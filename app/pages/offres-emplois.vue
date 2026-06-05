@@ -6,6 +6,11 @@ useHead({
 
 // Fetch jobs dynamically from our API
 const { data: jobs } = await useFetch('/api/jobs')
+
+const stripHtml = (html) => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
 </script>
 
 <template>
@@ -39,13 +44,13 @@ const { data: jobs } = await useFetch('/api/jobs')
               <img :src="useAssetUrl(job.logo, 'logo')" alt="Logo entreprise" class="job-logo" />
             </div>
             <h3 class="job-card-title">{{ job.title }}</h3>
-            <p class="job-card-description">{{ job.description }}</p>
+            <p class="job-card-description">{{ stripHtml(job.description) }}</p>
           </div>
           <div class="job-card-footer">
-            <a :href="job.link" target="_blank" rel="noopener" class="job-card-link">
+            <NuxtLink :to="`/offres-emplois/${job.id}`" class="job-card-link">
               Voir l'offre
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-            </a>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -280,14 +285,14 @@ const { data: jobs } = await useFetch('/api/jobs')
 
 .job-logo-wrapper {
   margin-bottom: 1.25rem;
-  height: 50px;
+  height: 75px;
   display: flex;
   align-items: center;
 }
 
 .job-logo {
   max-height: 100%;
-  max-width: 120px;
+  max-width: 150px;
   object-fit: contain;
 }
 </style>
