@@ -17,7 +17,11 @@
             </NuxtLink>
             <ul class="dropdown-menu">
               <li v-for="service in services" :key="service.id">
-                <NuxtLink :to="`/services/${service.id}`" class="dropdown-link">
+                <NuxtLink 
+                  :to="`/services/${service.id}`" 
+                  class="dropdown-link" 
+                  :class="{ 'highlight-formation': service.title.toLowerCase().includes('formation') }"
+                >
                   {{ service.title }}
                 </NuxtLink>
               </li>
@@ -46,7 +50,12 @@
           </button>
           <ul v-show="servicesOpen" class="mobile-sub-nav">
             <li v-for="service in services" :key="service.id">
-              <NuxtLink :to="`/services/${service.id}`" class="mobile-sub-link" @click="menuOpen = false">
+              <NuxtLink 
+                :to="`/services/${service.id}`" 
+                class="mobile-sub-link" 
+                :class="{ 'highlight-formation': service.title.toLowerCase().includes('formation') }"
+                @click="menuOpen = false"
+              >
                 {{ service.title }}
               </NuxtLink>
             </li>
@@ -188,6 +197,15 @@ const { data: services } = await useFetch('/api/services')
   background-color: #f7f9fc;
   color: #e91e8c;
   padding-left: 1.8rem;
+}
+
+.dropdown-link.highlight-formation {
+  color: rgb(66, 185, 181);
+  font-weight: 600;
+}
+
+.dropdown-link.highlight-formation:hover {
+  color: #38a7a3;
 }
 
 .dropdown-cat-header {
@@ -334,6 +352,15 @@ const { data: services } = await useFetch('/api/services')
   color: #4a5568;
   text-decoration: none;
   border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-sub-link.highlight-formation {
+  color: rgb(66, 185, 181);
+  font-weight: 600;
+}
+
+.mobile-sub-link.highlight-formation:hover {
+  color: #38a7a3;
 }
 
 @media (max-width: 900px) {

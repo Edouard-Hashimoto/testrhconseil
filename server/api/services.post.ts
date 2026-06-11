@@ -10,18 +10,24 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb();
   
+  // Fetch max sort_order to append the new service at the end
+  const maxOrderRes = await db.execute('SELECT MAX(sort_order) as max_order FROM services');
+  const maxOrder = Number(maxOrderRes.rows[0]?.max_order || 0);
+  const nextOrder = maxOrder + 1;
+  
   // 1. Insertion du service
   const res = await db.execute({ 
-    sql: 'INSERT INTO services (title, color, logo, description, category_id, video_url, show_themes, show_formations) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
+    sql: 'INSERT INTO services (title, color, logo, description, category_id, video_url, show_themes, show_formations, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
     args: [
       body.title, 
       body.color || '#6b21a8', 
       body.logo || null, 
       body.description || null, 
-      (body.category_ids && body.category_ids.length > 0) ? body.category_ids[0] : null, // Keep legacy column for now
+      null, 
       body.video_url || null,
       body.show_themes !== undefined ? Number(body.show_themes) : 1,
-      body.show_formations !== undefined ? Number(body.show_formations) : 1
+      body.show_formations !== undefined ? Number(body.show_formations) : 1,
+      nextOrder
     ] 
   });
 

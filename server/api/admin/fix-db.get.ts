@@ -56,6 +56,13 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
+      await db.execute("ALTER TABLE services ADD COLUMN sort_order INTEGER DEFAULT 0");
+      logs.push("Colonne 'sort_order' ajoutée avec succès sur services.");
+    } catch (e) {
+      logs.push("Colonne 'sort_order' déjà présente ou erreur ignorée sur services.");
+    }
+
+    try {
       await db.execute(`
         CREATE TABLE IF NOT EXISTS jobs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,

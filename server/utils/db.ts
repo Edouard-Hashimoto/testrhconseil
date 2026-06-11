@@ -51,6 +51,7 @@ export const initDb = async () => {
       video_url TEXT,
       show_themes INTEGER DEFAULT 1,
       show_formations INTEGER DEFAULT 1,
+      sort_order INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE TABLE IF NOT EXISTS settings (
@@ -143,6 +144,7 @@ export const initDb = async () => {
   try { await db.execute(`ALTER TABLE services ADD COLUMN video_url TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE services ADD COLUMN show_themes INTEGER DEFAULT 1`); } catch(e) {}
   try { await db.execute(`ALTER TABLE services ADD COLUMN show_formations INTEGER DEFAULT 1`); } catch(e) {}
+  try { await db.execute(`ALTER TABLE services ADD COLUMN sort_order INTEGER DEFAULT 0`); } catch(e) {}
   try { await db.execute(`ALTER TABLE jobs ADD COLUMN logo TEXT`); } catch(e) {}
   try {
     await db.execute(`

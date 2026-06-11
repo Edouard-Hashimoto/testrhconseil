@@ -227,6 +227,38 @@ const deleteService = async (id) => {
     alert("Erreur lors de la suppression")
   }
 }
+
+const moveServiceUp = async (index) => {
+  if (index === 0) return
+  const list = [...services.value]
+  const temp = list[index]
+  list[index] = list[index - 1]
+  list[index - 1] = temp
+  services.value = list
+  await saveNewOrder(list.map(s => s.id))
+}
+
+const moveServiceDown = async (index) => {
+  if (index === services.value.length - 1) return
+  const list = [...services.value]
+  const temp = list[index]
+  list[index] = list[index + 1]
+  list[index + 1] = temp
+  services.value = list
+  await saveNewOrder(list.map(s => s.id))
+}
+
+const saveNewOrder = async (ids) => {
+  try {
+    await $fetch('/api/services/reorder', {
+      method: 'POST',
+      body: { ids }
+    })
+  } catch (e) {
+    alert("Erreur lors de la mise à jour de l'ordre")
+    await refresh()
+  }
+}
 </script>
 
 <template>
@@ -438,6 +470,7 @@ const deleteService = async (id) => {
           <table class="services-table">
             <thead>
               <tr>
+                <th style="width: 80px;">Ordre</th>
                 <th>Couleur</th>
                 <th>Titre / Description</th>
                 <th>Logo</th>
@@ -445,9 +478,9 @@ const deleteService = async (id) => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="service in services" :key="service.id">
+              <tr v-for="(service, idx) in services" :key="service.id">
                 <template v-if="editingId === service.id">
-                  <td colspan="4" class="edit-mode-cell">
+                  <td colspan="5" class="edit-mode-cell">
                     <div class="edit-full-layout">
                       <!-- Barre latérale -->
                       <div class="edit-sidebar">
@@ -574,6 +607,28 @@ const deleteService = async (id) => {
                   </td>
                 </template>
                 <template v-else>
+                  <td>
+                    <div class="order-actions-cell">
+                      <button 
+                        type="button" 
+                        @click="moveServiceUp(idx)" 
+                        :disabled="idx === 0" 
+                        class="btn-order-arrow" 
+                        title="Monter"
+                      >
+                        ▲
+                      </button>
+                      <button 
+                        type="button" 
+                        @click="moveServiceDown(idx)" 
+                        :disabled="idx === services.length - 1" 
+                        class="btn-order-arrow" 
+                        title="Descendre"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  </td>
                   <td>
                     <div class="color-swatch" :style="{ background: service.color }"></div>
                   </td>
@@ -782,4 +837,34 @@ const deleteService = async (id) => {
 .mt-8 { margin-top: 2rem; }
 .mini-input-date { padding: 0.35rem; border: 1.1px solid #c2eaea; border-radius: 6px; font-size: 0.8rem; width: 100%; outline: none; background: #fff; color: #42b9b5; font-weight: 700; cursor: pointer; }
 .mini-input-date:focus { border-color: #42b9b5; }
+
+.order-actions-cell {
+  display: flex;
+  gap: 0.3rem;
+}
+.btn-order-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #475569;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+.btn-order-arrow:hover:not(:disabled) {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+.btn-order-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
 </style>

@@ -2,7 +2,7 @@ export default defineEventHandler(async () => {
   const db = useDb();
   
   // Requête 1 : Obtenir tous les services
-  const res = await db.execute('SELECT * FROM services ORDER BY created_at ASC');
+  const res = await db.execute('SELECT * FROM services ORDER BY sort_order ASC, id ASC');
   
   const catsMap: Record<string, number[]> = {};
   const themesMap: Record<string, any[]> = {};
