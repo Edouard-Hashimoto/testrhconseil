@@ -2,7 +2,6 @@
 definePageMeta({ middleware: 'auth' })
 
 const { data: services, refresh: refreshServices } = await useFetch('/api/services')
-const { data: categories } = await useFetch('/api/categories')
 
 onMounted(async () => {
   if (services.value?.length === 0) await refresh()
@@ -252,10 +251,6 @@ const deleteService = async (id) => {
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
           Services
         </NuxtLink>
-        <NuxtLink to="/admin/categories" class="nav-item">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581a2.25 2.25 0 003.182 0l4.318-4.318a2.25 2.25 0 000-3.182L11.159 3.659A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
-          Catégories
-        </NuxtLink>
         <NuxtLink to="/admin/particuliers" class="nav-item">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
           Particuliers
@@ -324,15 +319,6 @@ const deleteService = async (id) => {
           <div class="field grow">
             <label>Logo (image)</label>
             <input type="file" accept="image/*" class="file-input" />
-          </div>
-          <div class="field grow basis-full">
-            <label>Catégories</label>
-            <div class="checkbox-grid">
-              <label v-for="cat in categories" :key="cat.id" class="checkbox-item">
-                <input type="checkbox" :value="Number(cat.id)" v-model="newService.category_ids" />
-                <span>{{ cat.titre }}</span>
-              </label>
-            </div>
           </div>
           <div class="field basis-full">
             <label>Description introduction (facultatif)</label>
@@ -453,7 +439,6 @@ const deleteService = async (id) => {
             <thead>
               <tr>
                 <th>Couleur</th>
-                <th>Catégories</th>
                 <th>Titre / Description</th>
                 <th>Logo</th>
                 <th class="text-right">Actions</th>
@@ -462,22 +447,13 @@ const deleteService = async (id) => {
             <tbody>
               <tr v-for="service in services" :key="service.id">
                 <template v-if="editingId === service.id">
-                  <td colspan="5" class="edit-mode-cell">
+                  <td colspan="4" class="edit-mode-cell">
                     <div class="edit-full-layout">
-                      <!-- Barre latérale / Catégories -->
+                      <!-- Barre latérale -->
                       <div class="edit-sidebar">
                         <div class="field">
                           <label>Couleur</label>
                           <input v-model="editData.color" type="color" class="color-pick-small" />
-                        </div>
-                        <div class="field mt-4">
-                          <label>Catégories</label>
-                          <div class="checkbox-grid-mini">
-                            <label v-for="cat in categories" :key="cat.id" class="checkbox-item-mini">
-                              <input type="checkbox" :value="Number(cat.id)" v-model="editData.category_ids" />
-                              <span>{{ cat.titre }}</span>
-                            </label>
-                          </div>
                         </div>
                         <div class="field mt-4">
                           <label>Logo du service</label>
@@ -600,14 +576,6 @@ const deleteService = async (id) => {
                 <template v-else>
                   <td>
                     <div class="color-swatch" :style="{ background: service.color }"></div>
-                  </td>
-                  <td>
-                    <div class="tag-container" v-if="service.category_ids && service.category_ids.length > 0">
-                      <span v-for="catId in service.category_ids" :key="catId" class="stat-pill-sm">
-                        {{ categories?.find(c => c.id === catId)?.titre || '?' }}
-                      </span>
-                    </div>
-                    <span v-else class="no-logo">Aucune</span>
                   </td>
                   <td>
                     <div class="service-name">{{ service.title }}</div>

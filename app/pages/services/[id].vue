@@ -79,16 +79,18 @@ const getYoutubeEmbedUrl = (url) => {
           <img v-if="service.logo" :src="service.logo.startsWith('http') ? service.logo : `/logos/${service.logo}`" class="service-logo" alt="" />
         </div>
       </div>
+                  <div class="description-text" v-if="service.description">
+              <p v-for="(para, idx) in service.description.split('\n')" :key="idx">
+                {{ para }}
+              </p>
+            </div>
+            
 
       <div class="service-main">
         <div class="service-content">
           <template v-if="!service.title.toLowerCase().includes('formation')">
             <h2 class="section-title">Prestations</h2>
-            <div class="description-text" v-if="service.description">
-              <p v-for="(para, idx) in service.description.split('\n')" :key="idx">
-                {{ para }}
-              </p>
-            </div>
+
           </template>
 
           <!-- Accordion Themes -->
