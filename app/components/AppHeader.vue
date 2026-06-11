@@ -200,12 +200,14 @@ const { data: services } = await useFetch('/api/services')
 }
 
 .dropdown-link.highlight-formation {
-  color: rgb(66, 185, 181);
+  background-color: rgb(66, 185, 181);
+  color: #ffffff;
   font-weight: 600;
 }
 
 .dropdown-link.highlight-formation:hover {
-  color: #38a7a3;
+  background-color: #38a7a3;
+  color: #ffffff;
 }
 
 .dropdown-cat-header {
@@ -355,12 +357,17 @@ const { data: services } = await useFetch('/api/services')
 }
 
 .mobile-sub-link.highlight-formation {
-  color: rgb(66, 185, 181);
+  background-color: rgb(66, 185, 181);
+  color: #ffffff;
   font-weight: 600;
+  border-radius: 4px;
+  padding: 0.6rem 1rem;
+  margin: 0.2rem 0.5rem;
 }
 
 .mobile-sub-link.highlight-formation:hover {
-  color: #38a7a3;
+  background-color: #38a7a3;
+  color: #ffffff;
 }
 
 @media (max-width: 900px) {
