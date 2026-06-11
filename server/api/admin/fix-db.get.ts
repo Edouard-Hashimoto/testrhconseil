@@ -63,6 +63,13 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
+      await db.execute("ALTER TABLE equipe ADD COLUMN badge TEXT");
+      logs.push("Colonne 'badge' ajoutée avec succès sur equipe.");
+    } catch (e) {
+      logs.push("Colonne 'badge' déjà présente ou erreur ignorée sur equipe.");
+    }
+
+    try {
       await db.execute(`
         CREATE TABLE IF NOT EXISTS jobs (
           id INTEGER PRIMARY KEY AUTOINCREMENT,

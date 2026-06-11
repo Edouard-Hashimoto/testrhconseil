@@ -75,6 +75,7 @@ export const initDb = async () => {
       role TEXT NOT NULL,
       description TEXT,
       image TEXT,
+      badge TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE TABLE IF NOT EXISTS categories (
@@ -146,6 +147,7 @@ export const initDb = async () => {
   try { await db.execute(`ALTER TABLE services ADD COLUMN show_formations INTEGER DEFAULT 1`); } catch(e) {}
   try { await db.execute(`ALTER TABLE services ADD COLUMN sort_order INTEGER DEFAULT 0`); } catch(e) {}
   try { await db.execute(`ALTER TABLE jobs ADD COLUMN logo TEXT`); } catch(e) {}
+  try { await db.execute(`ALTER TABLE equipe ADD COLUMN badge TEXT`); } catch(e) {}
   try {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS jobs (

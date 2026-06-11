@@ -29,6 +29,15 @@ useHead({
           <h1 class="member-name">{{ membre.nom }}</h1>
           <p class="member-service">{{ membre.role }}</p>
           <div class="member-desc">{{ membre.description }}</div>
+          <div v-if="membre.badge" class="badge-wrapper">
+            <span 
+              v-for="badge in (membre.badge || '').split(',').map(b => b.trim()).filter(b => b)" 
+              :key="badge" 
+              class="member-badge"
+            >
+              {{ badge }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -121,6 +130,35 @@ useHead({
   color: #475569;
   white-space: pre-wrap;
   text-align: justify;
+}
+
+.badge-wrapper {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.member-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  background: rgba(66, 185, 181, 0.1);
+  color: rgb(66, 185, 181);
+  border: 1.5px solid rgba(66, 185, 181, 0.25);
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 0 4px 12px rgba(66, 185, 181, 0.08);
+  transition: all 0.3s ease;
+}
+
+.member-badge:hover {
+  background: rgba(66, 185, 181, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(66, 185, 181, 0.12);
 }
 
 @media (max-width: 900px) {

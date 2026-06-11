@@ -3,7 +3,7 @@ definePageMeta({ middleware: 'auth' })
 
 const { data: equipe, refresh } = await useFetch('/api/equipe')
 
-const newMembre = ref({ nom: '', role: '', description: '' })
+const newMembre = ref({ nom: '', role: '', description: '', badge: '' })
 const editingId = ref(null)
 const editData = ref({})
 const uploading = ref(false)
@@ -43,7 +43,7 @@ const createMembre = async (evt) => {
     if (imageFile) image = await uploadImage(imageFile)
     
     await $fetch('/api/equipe', { method: 'POST', body: { ...newMembre.value, image } })
-    newMembre.value = { nom: '', role: '', description: '' }
+    newMembre.value = { nom: '', role: '', description: '', badge: '' }
     if (fileInputImage) fileInputImage.value = ''
     await refresh()
   } catch (e) {
@@ -173,6 +173,10 @@ const deleteMembre = async (id) => {
             <label>Service (Rôle)</label>
             <input v-model="newMembre.role" type="text" placeholder="ex: Consultante RH" required />
           </div>
+          <div class="field grow basis-full">
+            <label>Badge (ex: UIMM, Expert, etc. - Optionnel)</label>
+            <input v-model="newMembre.badge" type="text" placeholder="ex: Membre de l'UIMM" />
+          </div>
           <div class="field basis-full">
             <label>Description</label>
             <textarea v-model="newMembre.description" placeholder="Description..." rows="4" required></textarea>
@@ -215,6 +219,7 @@ const deleteMembre = async (id) => {
                   <td>
                     <input v-model="editData.nom" class="edit-input mb-2" style="width: 100%;" placeholder="Nom" />
                     <input v-model="editData.role" class="edit-input mb-2" style="width: 100%;" placeholder="Service" />
+                    <input v-model="editData.badge" class="edit-input mb-2" style="width: 100%;" placeholder="Badge" />
                     <textarea v-model="editData.description" class="edit-input" style="width: 100%; font-size: 0.8rem;" rows="3" placeholder="Description"></textarea>
                   </td>
                   <td>
@@ -233,6 +238,7 @@ const deleteMembre = async (id) => {
                   <td>
                     <div class="service-name">{{ membre.nom }}</div>
                     <div class="service-desc-preview"><b>Service:</b> {{ membre.role }}</div>
+                    <div v-if="membre.badge" class="service-desc-preview"><b>Badge:</b> {{ membre.badge }}</div>
                     <div class="service-desc-preview"><b>Desc:</b> {{ membre.description?.substring(0, 50) }}{{ (membre.description?.length > 50) ? '...' : '' }}</div>
                   </td>
                   <td>
