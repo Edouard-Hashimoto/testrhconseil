@@ -22,12 +22,12 @@ const qualiopiTextLines = computed(() => {
 const mainStat = computed(() => statistics.value && statistics.value.length > 0 ? statistics.value[0] : null)
 const latestNews = computed(() => news.value && news.value.length > 0 ? news.value[0] : null)
 
-const servicesWithVideo = computed(() => {
+const servicesWithStats = computed(() => {
   const baseServices = services.value || []
   const list = [...baseServices]
   if (baseServices.length > 0) {
     const insertIndex = Math.min(4, list.length)
-    list.splice(insertIndex, 0, { isVideo: true, id: 'youtube-video' })
+    list.splice(insertIndex, 0, { isStats: true, id: 'home-stats' })
   }
   return list
 })
@@ -59,6 +59,7 @@ onMounted(() => {
       <div class="hero-inner">
         <div class="hero-text">
           <h1 class="hero-title" v-html="homeHeroTitle"></h1>
+          <p class="hero-subtitle">Société de conseils et de services dans le domaine des Ressources Humaines, du recrutement et QHSE.</p>
         </div>
         <div class="hero-img">
           <img src="~/assets/img/logo_rhc.png" alt="RH Conseil 71 — Diversité de compétences" />
@@ -77,29 +78,31 @@ onMounted(() => {
               <p class="stat-card-action actu-action">Voir les actualités →</p>
             </div>
           </NuxtLink>
-          <NuxtLink to="/statistiques" class="stat-card stat-link">
-            <img v-if="mainStat?.image" :src="useAssetUrl(mainStat.image, 'statistics')" class="stat-card-bg" alt="Stats background" />
-            <div class="stat-card-body">
-              <span class="stat-card-label">Statistiques</span>
-              <h2 class="stat-card-title">{{ mainStat?.title || 'Statistiques 2024-2025' }}</h2>
-              <p class="stat-card-action">Voir les statistiques →</p>
-            </div>
-          </NuxtLink>
+          <div class="stat-card video-card-left">
+            <iframe
+              :src="homeVideoUrl"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
+            ></iframe>
+          </div>
         </div>
 
         <div class="right-col">
           <div class="services-grid">
-            <template v-for="item in servicesWithVideo" :key="item.id">
-              <div v-if="item.isVideo" class="service-card video-card">
-                <iframe
-                  :src="homeVideoUrl"
-                  title="YouTube video player"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  allowfullscreen
-                ></iframe>
-              </div>
+            <template v-for="item in servicesWithStats" :key="item.id">
+              <NuxtLink v-if="item.isStats" to="/statistiques" class="service-card stat-service-card">
+                <img v-if="mainStat?.image" :src="useAssetUrl(mainStat.image, 'statistics')" class="service-card-bg" alt="Stats background" />
+                <div class="service-card-content">
+                  <div>
+                    <span class="service-card-label">Statistiques</span>
+                    <span class="service-title">{{ mainStat?.title || 'Statistiques 2024-2025' }}</span>
+                  </div>
+                  <span class="service-action">Voir →</span>
+                </div>
+              </NuxtLink>
               <NuxtLink
                 v-else
                 :to="`/services/${item.id}`"
@@ -135,7 +138,7 @@ onMounted(() => {
         </div>
 
         <div ref="presImgRef" class="pres-img-wrap">
-          <img src="~/assets/img/presentation_equipe.webp" alt="Équipe RH Conseil 71" class="pres-img" />
+          <img src="~/assets/img/RHC.webp" alt="Équipe RH Conseil 71" class="pres-img" />
         </div>
       </div>
     </section>
@@ -154,7 +157,7 @@ onMounted(() => {
             <div class="mission-icon-wrap">
               <img src="~/assets/picto/Accompagnement_RH_.png" alt="Consultants RH" />
             </div>
-            <p class="mission-label">Consultants RH</p>
+            <p class="mission-label">Consultant RH</p>
           </div>
           <div class="mission-card card-orange">
             <div class="mission-icon-wrap">
@@ -166,7 +169,7 @@ onMounted(() => {
             <div class="mission-icon-wrap">
               <img src="~/assets/picto/Juridique.png" alt="Juristes en droit social" />
             </div>
-            <p class="mission-label">Juristes en droit social</p>
+            <p class="mission-label">Juriste en droit social</p>
           </div>
         </div>
       </div>
@@ -174,19 +177,24 @@ onMounted(() => {
 
     <section v-if="qualiopiVisible" class="qualiopi-section">
       <div class="qualiopi-inner">
-        <div class="qualiopi-content">
-          <h2 class="qualiopi-title">{{ qualiopiTextLines[0] }}</h2>
-          <ul class="qualiopi-list" v-if="qualiopiTextLines.length > 1">
-            <li v-for="line in qualiopiTextLines.slice(1)" :key="line">{{ line }}</li>
-          </ul>
-          <div class="qualiopi-actions">
-            <a href="/certificat.pdf" download class="btn-certif btn-download">
-              <svg class="icon-dl" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-11v4h3l-4 4-4-4h3V9h2z"/>
-              </svg>
-              Télécharger
-            </a>
-            <NuxtLink to="/qualiopi" class="btn-certif btn-more">En savoir plus</NuxtLink>
+        <div class="qualiopi-container">
+          <div class="qualiopi-logo">
+            <img src="~/assets/img/qualiopi.webp" alt="Logo Qualiopi" class="qualiopi-img" />
+          </div>
+          <div class="qualiopi-content">
+            <h2 class="qualiopi-title">{{ qualiopiTextLines[0] }}</h2>
+            <ul class="qualiopi-list" v-if="qualiopiTextLines.length > 1">
+              <li v-for="line in qualiopiTextLines.slice(1)" :key="line">{{ line }}</li>
+            </ul>
+            <div class="qualiopi-actions">
+              <a href="/certificat.pdf" download class="btn-certif btn-download">
+                <svg class="icon-dl" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-11v4h3l-4 4-4-4h3V9h2z"/>
+                </svg>
+                Télécharger
+              </a>
+              <NuxtLink to="/qualiopi" class="btn-certif btn-more">En savoir plus</NuxtLink>
+            </div>
           </div>
         </div>
       </div>
@@ -225,6 +233,14 @@ onMounted(() => {
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: #BA0F60; /* Fallback */
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: #475569;
+  margin-top: 1.2rem;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 
@@ -866,6 +882,93 @@ onMounted(() => {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 1.5rem;
+}
+
+.qualiopi-container {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+}
+
+.qualiopi-logo {
+  flex: 0 0 260px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qualiopi-img {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  object-fit: contain;
+}
+
+.video-card-left {
+  background-color: #fff !important;
+  padding: 0 !important;
+  overflow: hidden;
+  display: block;
+}
+
+.video-card-left iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.stat-service-card {
+  background-color: #4a1942 !important;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.service-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.3;
+  z-index: 0;
+  transition: opacity 0.3s, transform 0.5s;
+}
+
+.stat-service-card:hover .service-card-bg {
+  opacity: 0.4;
+  transform: scale(1.05);
+}
+
+.service-card-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.service-card-label {
+  display: block;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 0.2rem;
+}
+
+.service-action {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e91e8c;
+  background: #fff;
+  align-self: flex-start;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  margin-top: 0.5rem;
 }
 
 .qualiopi-content {

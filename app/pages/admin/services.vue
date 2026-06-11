@@ -127,6 +127,38 @@ const removeTheme = (target, index) => {
   data.themes.splice(index, 1)
 }
 
+const moveThemeUp = (target, index) => {
+  const data = target.value || target
+  if (index === 0) return
+  const temp = data.themes[index]
+  data.themes[index] = data.themes[index - 1]
+  data.themes[index - 1] = temp
+}
+
+const moveThemeDown = (target, index) => {
+  const data = target.value || target
+  if (index === data.themes.length - 1) return
+  const temp = data.themes[index]
+  data.themes[index] = data.themes[index + 1]
+  data.themes[index + 1] = temp
+}
+
+const moveFormationUp = (target, index) => {
+  const data = target.value || target
+  if (index === 0) return
+  const temp = data.formations[index]
+  data.formations[index] = data.formations[index - 1]
+  data.formations[index - 1] = temp
+}
+
+const moveFormationDown = (target, index) => {
+  const data = target.value || target
+  if (index === data.formations.length - 1) return
+  const temp = data.formations[index]
+  data.formations[index] = data.formations[index + 1]
+  data.formations[index + 1] = temp
+}
+
 const addFormation = (target) => {
   const data = (target && target.value) ? target.value : target
   if (!data.formations) data.formations = []
@@ -382,6 +414,10 @@ const saveNewOrder = async (ids) => {
               <div v-for="(theme, idx) in newService.themes" :key="idx" class="theme-item-edit">
                 <div class="theme-row-top">
                   <input v-model="theme.title" type="text" placeholder="Titre de la thématique (ex: Audit sur la classification...)" class="grow" />
+                  <div class="mini-order-actions">
+                    <button type="button" @click="moveThemeUp(newService, idx)" :disabled="idx === 0" class="btn-order-arrow-mini" title="Monter">▲</button>
+                    <button type="button" @click="moveThemeDown(newService, idx)" :disabled="idx === newService.themes.length - 1" class="btn-order-arrow-mini" title="Descendre">▼</button>
+                  </div>
                   <button type="button" @click="removeTheme(newService, idx)" class="btn-remove-mini">×</button>
                 </div>
                 
@@ -409,6 +445,10 @@ const saveNewOrder = async (ids) => {
               <div v-for="(form, idx) in newService.formations" :key="idx" class="theme-item-edit-large" style="border-left: 4px solid #F7A600;">
                 <div class="theme-row-top">
                   <input v-model="form.title" type="text" placeholder="Titre de la formation..." class="grow" />
+                  <div class="mini-order-actions">
+                    <button type="button" @click="moveFormationUp(newService, idx)" :disabled="idx === 0" class="btn-order-arrow-mini" title="Monter">▲</button>
+                    <button type="button" @click="moveFormationDown(newService, idx)" :disabled="idx === newService.formations.length - 1" class="btn-order-arrow-mini" title="Descendre">▼</button>
+                  </div>
                   <button type="button" @click="removeFormation(newService, idx)" class="btn-remove-mini">×</button>
                 </div>
                 
@@ -541,6 +581,10 @@ const saveNewOrder = async (ids) => {
                               <div v-for="(theme, idx) in editData.themes" :key="idx" class="theme-item-mini-v2">
                                 <div class="theme-mini-row">
                                   <input v-model="theme.title" placeholder="Titre du thème" class="mini-input grow" style="font-weight: 700;" />
+                                  <div class="mini-order-actions">
+                                    <button type="button" @click="moveThemeUp(editData, idx)" :disabled="idx === 0" class="btn-order-arrow-mini" title="Monter">▲</button>
+                                    <button type="button" @click="moveThemeDown(editData, idx)" :disabled="idx === editData.themes.length - 1" class="btn-order-arrow-mini" title="Descendre">▼</button>
+                                  </div>
                                   <button type="button" @click="removeTheme(editData, idx)" class="btn-remove-mini">×</button>
                                 </div>
                                 <div class="mini-objectives">
@@ -567,6 +611,10 @@ const saveNewOrder = async (ids) => {
                               <div v-for="(form, idx) in editData.formations" :key="idx" class="theme-item-mini-v2" style="border-left-color: #F7A600;">
                                 <div class="theme-mini-row">
                                   <input v-model="form.title" placeholder="Nom de la formation" class="mini-input grow" style="font-weight: 700;" />
+                                  <div class="mini-order-actions">
+                                    <button type="button" @click="moveFormationUp(editData, idx)" :disabled="idx === 0" class="btn-order-arrow-mini" title="Monter">▲</button>
+                                    <button type="button" @click="moveFormationDown(editData, idx)" :disabled="idx === editData.formations.length - 1" class="btn-order-arrow-mini" title="Descendre">▼</button>
+                                  </div>
                                   <button type="button" @click="removeFormation(editData, idx)" class="btn-remove-mini">×</button>
                                 </div>
                                 <div class="formation-meta-edit-mini-v2">
@@ -864,6 +912,38 @@ const saveNewOrder = async (ids) => {
   border-color: #94a3b8;
 }
 .btn-order-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.mini-order-actions {
+  display: flex;
+  gap: 0.15rem;
+  align-items: center;
+}
+
+.btn-order-arrow-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  color: #64748b;
+  font-size: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+.btn-order-arrow-mini:hover:not(:disabled) {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+.btn-order-arrow-mini:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }

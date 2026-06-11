@@ -33,10 +33,10 @@ const onQualiopiError = (e) => {
             75 Grande Rue Saint-Cosme<br />71100 Chalon-sur-Saône
           </li>
           <li>
-            <a href="tel:0385421865">• 03 85 42 18 65</a>
+            <a href="tel:0385421865">03 85 42 18 65</a>
           </li>
           <li>
-            <a href="mailto:accueil@rhconseil71.com">• accueil@rhconseil71.com</a>
+            <a href="mailto:accueil@rhconseil71.com">accueil@rhconseil71.com</a>
           </li>
         </ul>
       </div>
@@ -166,7 +166,6 @@ const onQualiopiError = (e) => {
 }
 
 .contact-address {
-  padding-left: 0.5rem;
   line-height: 1.5;
   color: #555;
 }

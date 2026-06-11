@@ -15,22 +15,7 @@ const { data: jobs } = await useFetch('/api/jobs')
         <h1 class="page-title">Offres d'emploi</h1>
         <div class="title-underline"></div>
       </div>
-      <div class="content-card">
-        <div class="logo-side">
-          <img src="~/assets/img/vignette_industrie_recrute.png" alt="L'industrie recrute" class="partner-logo" />
-        </div>
-        <div class="text-side">
-          <h2 class="content-heading">L'industrie recrute !</h2>
-          <p class="content-text">
-            Vous recherchez un emploi dans l'industrie ?<br>
-            Consultez les offres sur le 1er hub de l'emploi et des métiers de l'industrie :<br>
-            <a href="https://www.lindustrie-recrute.fr/" target="_blank" rel="noopener" class="external-link">
-              https://www.lindustrie-recrute.fr/
-            </a>
-          </p>
-        </div>
-      </div>
-
+      
       <!-- Jobs Grid -->
       <div v-if="jobs && jobs.length > 0" class="jobs-grid">
         <div v-for="job in jobs" :key="job.id" class="job-card">
@@ -55,6 +40,22 @@ const { data: jobs } = await useFetch('/api/jobs')
       </div>
 
       <!-- Partner Logo Section -->
+      <div class="content-card">
+        <div class="logo-side">
+          <img src="~/assets/img/vignette_industrie_recrute.png" alt="L'industrie recrute" class="partner-logo" />
+        </div>
+        <div class="text-side">
+          <h2 class="content-heading">L'industrie recrute !</h2>
+          <p class="content-text">
+            Vous recherchez un emploi dans l'industrie ?<br>
+            Consultez les offres sur le 1er hub de l'emploi et des métiers de l'industrie :<br>
+            <a href="https://www.lindustrie-recrute.fr/" target="_blank" rel="noopener" class="external-link">
+              https://www.lindustrie-recrute.fr/
+            </a>
+          </p>
+        </div>
+      </div>
+
 
     </div>
   </div>

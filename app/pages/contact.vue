@@ -53,6 +53,12 @@
           </div>
         </div>
       </div>
+
+      <div class="building-section">
+        <div class="circle-border">
+          <img src="~/assets/img/batiment.jpg" alt="Maison des Entreprises 71" class="building-img" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -351,5 +357,33 @@ textarea {
   .contact-title { font-size: 2.8rem; }
   .form-row { flex-direction: column; gap: 1.5rem; }
   .leaflet-map-container { height: 400px; }
+}
+
+.building-section {
+  margin-top: 4rem;
+  display: flex;
+  justify-content: center;
+}
+
+.circle-border {
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 16/10;
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  display: flex;
+  border: 4px solid #C8D465;
+  padding: 12px;
+  background-color: transparent;
+  box-sizing: border-box;
+}
+
+.building-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 30px;
 }
 </style>

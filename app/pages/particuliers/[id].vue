@@ -265,7 +265,7 @@ const isOffresEmploi = computed(() => {
   font-size: 1.1rem;
   line-height: 1.8;
   color: #334155;
-  text-align: left; /* Meilleur pour le mobile que 'justify' */
+  text-align: justify;
 }
 
 .description-text p {
