@@ -112,7 +112,7 @@ const isOffresEmploi = computed(() => {
               <p>Détails à venir pour ce service...</p>
             </div>
 
-            <div v-if="isBilanDeCompetences" class="download-section">
+            <div v-if="particulier.pdf_url || isBilanDeCompetences" class="download-section">
               <div class="download-card">
                 <div class="download-icon">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -120,10 +120,14 @@ const isOffresEmploi = computed(() => {
                   </svg>
                 </div>
                 <div class="download-info">
-                  <h4 class="download-card-title">Programme du Bilan de compétences</h4>
-                  <p class="download-card-desc">Consultez et téléchargez notre programme complet pour découvrir en détail le déroulement de notre accompagnement.</p>
+                  <h4 class="download-card-title">
+                    {{ (isBilanDeCompetences && !particulier.pdf_url) ? 'Programme du Bilan de compétences' : 'Document à télécharger' }}
+                  </h4>
+                  <p class="download-card-desc">
+                    {{ (isBilanDeCompetences && !particulier.pdf_url) ? 'Consultez et téléchargez notre programme complet pour découvrir en détail le déroulement de notre accompagnement.' : 'Consultez et téléchargez le document associé à ce service.' }}
+                  </p>
                 </div>
-                <a href="/bilan.pdf" download="Programme_Bilan_de_competences_RH_Conseil_71.pdf" class="btn-download">
+                <a :href="particulier.pdf_url || '/bilan.pdf'" target="_blank" :download="particulier.pdf_url ? null : 'Programme_Bilan_de_competences_RH_Conseil_71.pdf'" class="btn-download">
                   <span>Télécharger</span>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="btn-download-icon">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />

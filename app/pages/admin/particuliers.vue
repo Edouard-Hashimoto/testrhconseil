@@ -31,25 +31,43 @@ const uploadImage = async (file) => {
   }
 }
 
+const uploadPdf = async (file) => {
+  if (!file) return null
+  uploading.value = true
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const res = await $fetch('/api/upload-pdf', { method: 'POST', body: form })
+    return res.url
+  } finally {
+    uploading.value = false
+  }
+}
+
 const createParticulier = async (evt) => {
   const fileInputPicto = evt.target.closest('form').querySelector('input[name="picto"]')
   const fileInputImage = evt.target.closest('form').querySelector('input[name="image"]')
+  const fileInputPdf = evt.target.closest('form').querySelector('input[name="pdf"]')
   
   const pictoFile = fileInputPicto?.files?.[0]
   const imageFile = fileInputImage?.files?.[0]
+  const pdfFile = fileInputPdf?.files?.[0]
   
   saving.value = true
   try {
     let picto = null
     let image = null
+    let pdf_url = null
     
     if (pictoFile) picto = await uploadImage(pictoFile)
     if (imageFile) image = await uploadImage(imageFile)
+    if (pdfFile) pdf_url = await uploadPdf(pdfFile)
     
-    await $fetch('/api/particuliers', { method: 'POST', body: { ...newParticulier.value, picto, image } })
+    await $fetch('/api/particuliers', { method: 'POST', body: { ...newParticulier.value, picto, image, pdf_url } })
     newParticulier.value = { titre: '', description_courte: '', description_complete: '', color: '#42B9B5' }
     if (fileInputPicto) fileInputPicto.value = ''
     if (fileInputImage) fileInputImage.value = ''
+    if (fileInputPdf) fileInputPdf.value = ''
     await refresh()
   } catch (e) {
     alert("Erreur lors de la création")
@@ -66,19 +84,23 @@ const startEdit = (particulier) => {
 const saveEdit = async (evt) => {
   const fileInputPicto = evt.target.closest('tr')?.querySelector('input[name="pictoEdit"]')
   const fileInputImage = evt.target.closest('tr')?.querySelector('input[name="imageEdit"]')
+  const fileInputPdf = evt.target.closest('tr')?.querySelector('input[name="pdfEdit"]')
   
   const pictoFile = fileInputPicto?.files?.[0]
   const imageFile = fileInputImage?.files?.[0]
+  const pdfFile = fileInputPdf?.files?.[0]
   
   saving.value = true
   try {
     let picto = editData.value.picto
     let image = editData.value.image
+    let pdf_url = editData.value.pdf_url
     
     if (pictoFile) picto = await uploadImage(pictoFile)
     if (imageFile) image = await uploadImage(imageFile)
+    if (pdfFile) pdf_url = await uploadPdf(pdfFile)
     
-    await $fetch('/api/particuliers', { method: 'PUT', body: { ...editData.value, picto, image } })
+    await $fetch('/api/particuliers', { method: 'PUT', body: { ...editData.value, picto, image, pdf_url } })
     editingId.value = null
     await refresh()
   } catch (e) {
@@ -195,6 +217,10 @@ const deleteParticulier = async (id) => {
             <input type="file" name="image" accept="image/*" class="file-input" />
           </div>
           <div class="field grow">
+            <label>Document PDF (téléchargement)</label>
+            <input type="file" name="pdf" accept="application/pdf" class="file-input" />
+          </div>
+          <div class="field grow">
             <label>Couleur / Dégradé de fond</label>
             <input v-model="newParticulier.color" type="text" placeholder="ex: #42B9B5 ou linear-gradient(...)" />
           </div>
@@ -245,10 +271,19 @@ const deleteParticulier = async (id) => {
                       <img v-if="editData.picto" :src="useAssetUrl(editData.picto, 'particulier')" class="logo-thumb" />
                       <input type="file" name="pictoEdit" accept="image/*" class="file-input-sm" />
                     </div>
-                    <div class="logo-edit">
+                    <div class="logo-edit mb-2">
                       <span class="text-xs">Image:</span>
                       <img v-if="editData.image" :src="useAssetUrl(editData.image, 'particulier')" class="logo-thumb" />
                       <input type="file" name="imageEdit" accept="image/*" class="file-input-sm" />
+                    </div>
+                    <div class="logo-edit">
+                      <span class="text-xs">PDF:</span>
+                      <div v-if="editData.pdf_url" class="flex items-center gap-1">
+                        <a :href="editData.pdf_url" target="_blank" class="text-xs text-blue-600 underline truncate max-w-60" :title="editData.pdf_url">Voir</a>
+                        <button type="button" @click="editData.pdf_url = null" class="text-xs text-red-500 hover:text-red-700 font-bold" title="Supprimer le PDF">✕</button>
+                      </div>
+                      <span v-else class="text-xs text-gray-400">Aucun</span>
+                      <input type="file" name="pdfEdit" accept="application/pdf" class="file-input-sm" />
                     </div>
                   </td>
                   <td class="text-right">
@@ -273,10 +308,15 @@ const deleteParticulier = async (id) => {
                       <img v-if="part.picto" :src="useAssetUrl(part.picto, 'particulier')" class="logo-thumb" />
                       <span v-else class="no-logo">Aucun</span>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 mb-1">
                       <span class="text-xs text-gray-400">Image:</span>
                       <img v-if="part.image" :src="useAssetUrl(part.image, 'particulier')" class="logo-thumb" />
                       <span v-else class="no-logo">Aucune</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs text-gray-400">PDF:</span>
+                      <a v-if="part.pdf_url" :href="part.pdf_url" target="_blank" class="text-xs text-blue-600 underline truncate" style="max-width: 100px;">Télécharger</a>
+                      <span v-else class="text-xs text-gray-400">Aucun</span>
                     </div>
                   </td>
                   <td class="text-right">
@@ -368,4 +408,10 @@ const deleteParticulier = async (id) => {
 .block { display: block; }
 .color-preview { width: 16px; height: 16px; border-radius: 4px; border: 1px solid #e2e8f0; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.text-blue-600 { color: #2563eb; }
+.text-red-500 { color: #ef4444; }
+.hover\:text-red-700:hover { color: #b91c1c; }
+.underline { text-decoration: underline; }
+.gap-1 { gap: 0.25rem; }
+.max-w-60 { max-width: 60px; }
 </style>

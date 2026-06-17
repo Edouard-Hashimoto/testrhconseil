@@ -6,8 +6,16 @@ export default defineEventHandler(async (event) => {
 
   const db = useDb();
   const res = await db.execute({ 
-    sql: 'INSERT INTO particuliers (titre, description_courte, description_complete, picto, image, color) VALUES (?, ?, ?, ?, ?, ?)', 
-    args: [body.titre, body.description_courte || '', body.description_complete || '', body.picto || null, body.image || null, body.color || '#42B9B5'] 
+    sql: 'INSERT INTO particuliers (titre, description_courte, description_complete, picto, image, color, pdf_url) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+    args: [
+      body.titre, 
+      body.description_courte || '', 
+      body.description_complete || '', 
+      body.picto || null, 
+      body.image || null, 
+      body.color || '#42B9B5',
+      body.pdf_url || null
+    ] 
   });
 
   return { id: res.lastInsertRowid?.toString(), ...body };

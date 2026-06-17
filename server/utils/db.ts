@@ -66,6 +66,7 @@ export const initDb = async () => {
       picto TEXT,
       image TEXT,
       color TEXT DEFAULT '#42B9B5',
+      pdf_url TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE TABLE IF NOT EXISTS equipe (
@@ -148,6 +149,7 @@ export const initDb = async () => {
   try { await db.execute(`ALTER TABLE services ADD COLUMN sort_order INTEGER DEFAULT 0`); } catch(e) {}
   try { await db.execute(`ALTER TABLE jobs ADD COLUMN logo TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE equipe ADD COLUMN badge TEXT`); } catch(e) {}
+  try { await db.execute(`ALTER TABLE particuliers ADD COLUMN pdf_url TEXT`); } catch(e) {}
   try {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS jobs (

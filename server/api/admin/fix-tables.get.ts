@@ -31,6 +31,7 @@ export default defineEventHandler(async (event) => {
   await addColumn('particuliers', 'picto', 'TEXT');
   await addColumn('particuliers', 'image', 'TEXT');
   await addColumn('particuliers', 'color', "TEXT DEFAULT '#42B9B5'");
+  await addColumn('particuliers', 'pdf_url', 'TEXT');
   
   await addColumn('equipe', 'description', 'TEXT');
   await addColumn('equipe', 'image', 'TEXT');
