@@ -12,7 +12,7 @@ useHead({
     <div class="page-header">
       <h1 class="page-title">Particuliers</h1>
       <p class="page-desc">
-        Nous accompagnons les particuliers dans leurs démarches personnelles de Bilan de compétences, accompagnement individuel type coaching professionnel.
+        Chaque parcours est unique et peut soulever des questions à différentes étapes de la vie. En tant que psychologue du travail, nous accompagnons les personnes dans leurs réflexions professionnelles, leurs projets d'évolution ou leurs choix d'orientation. Notre approche repose sur l'écoute, l'analyse des ressources personnelles et l'identification de solutions adaptées aux besoins et aux aspirations de chacun.
       </p>
     </div>
 
