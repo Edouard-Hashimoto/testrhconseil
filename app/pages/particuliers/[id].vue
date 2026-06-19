@@ -73,6 +73,11 @@ const isOffresEmploi = computed(() => {
               </div>
             </div>
 
+            <!-- Empty State if no jobs available -->
+            <div v-else class="empty-jobs">
+              <p>Aucune offre d'emploi n'est disponible pour le moment. N'hésitez pas à consulter le portail partenaire ci-dessous.</p>
+            </div>
+
             <!-- Partner Section -->
             <div class="content-card">
               <div class="logo-side">
@@ -88,13 +93,6 @@ const isOffresEmploi = computed(() => {
                   </a>
                 </p>
               </div>
-            </div>
-
-            
-
-            <!-- Empty State if no jobs available -->
-            <div v-else class="empty-jobs">
-              <p>Aucune offre d'emploi n'est disponible pour le moment. N'hésitez pas à consulter le portail partenaire ci-dessous.</p>
             </div>
           </template>
 
