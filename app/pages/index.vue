@@ -1039,6 +1039,14 @@ onMounted(() => {
   .qualiopi-section {
     padding: 4rem 1.5rem;
   }
+  .qualiopi-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .qualiopi-logo {
+    flex: none;
+    max-width: 200px;
+  }
   .qualiopi-content {
     text-align: center;
   }
