@@ -123,7 +123,7 @@ const getYoutubeEmbedUrl = (url) => {
           <!-- Custom Calendar Layout for Formations -->
           <div v-if="Number(service.show_formations) !== 0 && service.title.toLowerCase().includes('formation') && service.formations && service.formations.length > 0" class="formations-calendar">
             <h2 class="section-title mt-12">Calendrier des formations</h2>
-            <NuxtLink to="/livret" class="catalogue-banner">
+            <a href="https://rhconseil.catalogueformpro.com/" target="_blank" rel="noopener noreferrer" class="catalogue-banner">
               <span class="catalogue-banner-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
               </span>
@@ -132,7 +132,7 @@ const getYoutubeEmbedUrl = (url) => {
                 <span>Consultez l'ensemble de nos formations disponibles</span>
               </span>
               <span class="catalogue-banner-arrow">→</span>
-            </NuxtLink>
+            </a>
             <div class="calendar-list">
               <div v-for="form in service.formations" :key="form.id" class="calendar-item">
                 <div class="calendar-date-col">
@@ -185,7 +185,7 @@ const getYoutubeEmbedUrl = (url) => {
           <!-- Standard Accordion Formations (fallback if not 'Formations' service) -->
           <div v-else-if="Number(service.show_formations) !== 0 && service.formations && service.formations.length > 0" class="formations-section">
             <h2 class="section-title mt-12">Nos formations</h2>
-            <NuxtLink to="/livret" class="catalogue-banner">
+            <a href="https://rhconseil.catalogueformpro.com/" target="_blank" rel="noopener noreferrer" class="catalogue-banner">
               <span class="catalogue-banner-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
               </span>
@@ -194,7 +194,7 @@ const getYoutubeEmbedUrl = (url) => {
                 <span>Consultez l'ensemble de nos formations disponibles</span>
               </span>
               <span class="catalogue-banner-arrow">→</span>
-            </NuxtLink>
+            </a>
             <div class="themes-accordion">
               <div 
                 v-for="form in service.formations" 
@@ -273,8 +273,8 @@ const getYoutubeEmbedUrl = (url) => {
               <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
             </div>
             <h3>Catalogue des formations</h3>
-            <p>Découvrez l'ensemble de nos formations dans notre livret 2026.</p>
-            <NuxtLink to="/livret" class="btn-catalogue">Voir le catalogue →</NuxtLink>
+            <p>Découvrez l'ensemble de nos formations dans notre catalogue en ligne.</p>
+            <a href="https://rhconseil.catalogueformpro.com/" target="_blank" rel="noopener noreferrer" class="btn-catalogue">Voir le catalogue →</a>
           </div>
 
           <div class="contact-card">
