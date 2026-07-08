@@ -36,6 +36,6 @@ export default defineEventHandler(async (event) => {
     return news;
   }
 
-  const res = await db.execute('SELECT * FROM news ORDER BY date DESC');
+  const res = await db.execute('SELECT * FROM news ORDER BY pinned DESC, date DESC');
   return res.rows;
 });

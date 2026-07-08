@@ -1,10 +1,13 @@
 <script setup>
 definePageMeta({ middleware: 'auth' })
 const { data: news, refresh } = await useFetch('/api/news')
-const newArticle = ref({ title: '', content: '' })
+const newArticle = ref({ title: '', content: '', pinned: 0 })
+const editingId = ref(null)
+const editData = ref({ title: '', content: '', image: null, pinned: 0 })
 const isSending = ref(false)
 const imageFile = ref(null)
 const fileInput = ref(null)
+const imagePreviewUrl = ref(null)
 
 const stripHtml = (html) => {
   if (!html) return ''
@@ -12,7 +15,76 @@ const stripHtml = (html) => {
 }
 
 const handleFileChange = (e) => {
-  imageFile.value = e.target.files[0]
+  const file = e.target.files[0]
+  if (file) {
+    imageFile.value = file
+    imagePreviewUrl.value = URL.createObjectURL(file)
+  }
+}
+
+const removeImage = () => {
+  if (editingId.value) {
+    editData.value.image = null
+  }
+  imageFile.value = null
+  imagePreviewUrl.value = null
+  if (fileInput.value) fileInput.value.value = ''
+}
+
+const cancelEdit = () => {
+  editingId.value = null
+  editData.value = { title: '', content: '', image: null, pinned: 0 }
+  imageFile.value = null
+  imagePreviewUrl.value = null
+  if (fileInput.value) fileInput.value.value = ''
+}
+
+const startEdit = (item) => {
+  editingId.value = item.id
+  editData.value = { 
+    title: item.title, 
+    content: item.content, 
+    image: item.image,
+    pinned: item.pinned || 0
+  }
+  imageFile.value = null
+  imagePreviewUrl.value = null
+  if (fileInput.value) fileInput.value.value = ''
+}
+
+const saveEdit = async () => {
+  if (!editData.value.title || !editData.value.content) return
+  isSending.value = true
+
+  try {
+    let imageUrl = editData.value.image
+
+    // 1. Upload new image if selected
+    if (imageFile.value) {
+      const imageFormData = new FormData()
+      imageFormData.append('file', imageFile.value)
+      const uploadResult = await $fetch('/api/upload-news-image', { method: 'POST', body: imageFormData })
+      imageUrl = uploadResult.url
+    }
+
+    // 2. Update article
+    await $fetch(`/api/news?id=${editingId.value}`, {
+      method: 'PUT',
+      body: {
+        title: editData.value.title,
+        content: editData.value.content,
+        imageUrl,
+        pinned: editData.value.pinned ? 1 : 0
+      }
+    })
+
+    cancelEdit()
+    await refresh()
+  } catch (e) {
+    alert("Erreur lors de la modification")
+  } finally {
+    isSending.value = false
+  }
 }
 
 const addArticle = async () => {
@@ -36,12 +108,14 @@ const addArticle = async () => {
       body: {
         title: newArticle.value.title,
         content: newArticle.value.content,
-        imageUrl
+        imageUrl,
+        pinned: newArticle.value.pinned ? 1 : 0
       }
     })
 
-    newArticle.value = { title: '', content: '' }
+    newArticle.value = { title: '', content: '', pinned: 0 }
     imageFile.value = null
+    imagePreviewUrl.value = null
     if (fileInput.value) fileInput.value.value = ''
     await refresh()
   } catch (e) {
@@ -214,25 +288,42 @@ const saveSettings = async () => {
       <section class="card">
         <h2 class="card-title">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-          Nouvel article
+          {{ editingId ? 'Modifier l\'article' : 'Nouvel article' }}
         </h2>
-        <form @submit.prevent="addArticle" class="form-grid">
+        <form @submit.prevent="editingId ? saveEdit() : addArticle()" class="form-grid">
           <div class="field">
             <label>Titre</label>
-            <input v-model="newArticle.title" type="text" placeholder="Titre de l'actualité" required />
+            <input v-model="(editingId ? editData : newArticle).title" type="text" placeholder="Titre de l'actualité" required />
           </div>
           <div class="field">
             <label>Image d'illustration (optionnel)</label>
-            <input @change="handleFileChange" type="file" accept="image/*" ref="fileInput" />
+            <div class="image-upload-box">
+              <div v-if="imagePreviewUrl || (editingId && editData.image)" class="image-preview-wrapper mb-2">
+                <img :src="imagePreviewUrl || useAssetUrl(editData.image, 'news')" class="image-preview-img" />
+                <button type="button" @click="removeImage" class="btn-remove-image" title="Supprimer l'image">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              <input type="file" ref="fileInput" accept="image/*" @change="handleFileChange" class="file-input" />
+            </div>
+          </div>
+          <div class="field span-full checkbox-container">
+            <label class="checkbox-label">
+              <input type="checkbox" v-model="(editingId ? editData : newArticle).pinned" :true-value="1" :false-value="0" />
+              Épingler cet article (À la une)
+            </label>
           </div>
           <div class="field span-full">
             <label>Contenu</label>
-            <RichEditor v-model="newArticle.content" />
+            <RichEditor v-model="(editingId ? editData : newArticle).content" />
           </div>
           <div class="span-full">
             <button type="submit" :disabled="isSending" class="btn-primary">
               <span v-if="isSending" class="spinner"></span>
-              {{ isSending ? 'Publication...' : 'Publier l\'article' }}
+              {{ isSending ? 'Enregistrement...' : (editingId ? 'Mettre à jour' : 'Publier l\'article') }}
+            </button>
+            <button v-if="editingId" type="button" @click="cancelEdit" class="btn-cancel" style="margin-left: 1rem;">
+              Annuler
             </button>
           </div>
         </form>
@@ -249,13 +340,21 @@ const saveSettings = async () => {
         <div v-else class="news-list">
           <div v-for="item in news" :key="item.id" class="news-item">
             <div class="news-item-info">
-              <span class="news-date">{{ new Date(item.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) }}</span>
+              <span class="news-date">
+                {{ new Date(item.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) }}
+                <span v-if="item.pinned" class="badge-pinned-admin">📍 Épinglé</span>
+              </span>
               <p class="news-title">{{ item.title }}</p>
               <p class="news-preview">{{ stripHtml(item.content).slice(0, 120) }}{{ stripHtml(item.content).length > 120 ? '…' : '' }}</p>
             </div>
-            <button @click="deleteArticle(item.id)" class="btn-delete" title="Supprimer">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-            </button>
+            <div class="item-actions">
+              <button @click="startEdit(item)" class="btn-edit-tool" title="Modifier">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+              </button>
+              <button @click="deleteArticle(item.id)" class="btn-delete" title="Supprimer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -698,5 +797,122 @@ const saveSettings = async () => {
 .logo-upload-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .logo-preview { width: 160px; height: auto; object-fit: contain; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0.5rem; background: #f8fafc; }
 .logo-upload-controls { display: flex; flex-direction: column; gap: 0.6rem; }
+
+/* Styles pour l'édition et l'épinglage des actualités */
+.badge-pinned-admin {
+  background: #fdf2f8;
+  color: #db2777;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #fbcfe8;
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-edit-tool {
+  padding: 0.4rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  color: #2563eb;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+.btn-edit-tool svg {
+  width: 16px;
+  height: 16px;
+}
+.btn-edit-tool:hover {
+  background: #dbeafe;
+}
+
+.btn-cancel {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+.checkbox-label input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #e91e8c;
+}
+
+.image-upload-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.image-preview-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.image-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+.btn-remove-image {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  padding: 0;
+}
+.btn-remove-image:hover {
+  background: #dc2626;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
 </style>
+
 

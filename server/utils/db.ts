@@ -39,7 +39,8 @@ export const initDb = async () => {
       title TEXT NOT NULL,
       content TEXT NOT NULL,
       image TEXT,
-      date DATETIME DEFAULT CURRENT_TIMESTAMP
+      date DATETIME DEFAULT CURRENT_TIMESTAMP,
+      pinned INTEGER DEFAULT 0
     )`,
     `CREATE TABLE IF NOT EXISTS services (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -150,6 +151,7 @@ export const initDb = async () => {
   try { await db.execute(`ALTER TABLE jobs ADD COLUMN logo TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE equipe ADD COLUMN badge TEXT`); } catch(e) {}
   try { await db.execute(`ALTER TABLE particuliers ADD COLUMN pdf_url TEXT`); } catch(e) {}
+  try { await db.execute(`ALTER TABLE news ADD COLUMN pinned INTEGER DEFAULT 0`); } catch(e) {}
   try {
     await db.execute(`
       CREATE TABLE IF NOT EXISTS jobs (

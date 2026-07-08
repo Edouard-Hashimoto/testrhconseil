@@ -9,7 +9,7 @@
       </header>
 
       <div v-if="news && news.length > 0" class="articles-grid">
-        <NuxtLink v-for="item in news" :key="item.id" :to="`/articles/${item.id}`" class="article-card">
+        <NuxtLink v-for="item in news" :key="item.id" :to="`/articles/${item.id}`" class="article-card" :class="{ 'is-pinned': item.pinned }">
           
           <div class="image-wrapper">
             <template v-if="item.image">
@@ -22,6 +22,12 @@
             </div>
             <div class="date-badge" v-if="item.image">
               {{ new Date(item.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }}
+            </div>
+            <div class="pinned-badge" v-if="item.pinned">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="pin-icon">
+                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+              </svg>
+              À la une
             </div>
           </div>
 
@@ -280,5 +286,34 @@ const articleSummary = (content) => {
 .card-content :deep(svg), 
 .card-content :deep(img) {
   display: none !important;
+}
+
+/* Styles pour l'épinglage des actualités */
+.article-card.is-pinned {
+  border: 1.5px solid var(--color-magenta);
+  box-shadow: 0 4px 15px rgba(216, 27, 96, 0.1);
+  position: relative;
+}
+
+.pinned-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--color-magenta);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+  z-index: 2;
+}
+
+.pin-icon {
+  width: 12px;
+  height: 12px;
 }
 </style>

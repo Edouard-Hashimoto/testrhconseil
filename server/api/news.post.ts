@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event);
 
-  const { title, content, imageUrl } = body || {};
+  const { title, content, imageUrl, pinned } = body || {};
 
   if (!title || !content) {
     throw createError({
@@ -19,8 +19,8 @@ export default defineEventHandler(async (event) => {
   const date = new Date().toISOString().split('T')[0];
 
   const res = await db.execute({
-    sql: 'INSERT INTO news (title, content, date, image) VALUES (?, ?, ?, ?)',
-    args: [title, content, date, imageUrl || null],
+    sql: 'INSERT INTO news (title, content, date, image, pinned) VALUES (?, ?, ?, ?, ?)',
+    args: [title, content, date, imageUrl || null, pinned ? 1 : 0],
   });
 
   return {
