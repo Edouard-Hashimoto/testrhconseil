@@ -4,7 +4,7 @@
       <header class="articles-header">
         <span class="category-tag">Actualités</span>
         <h1>Derniers articles</h1>
-        <p class="subtitle">Retrouvez toutes les actualités et informations importantes de RH Conseil 71.</p>
+        <p class="subtitle">Retrouvez toutes les actualités et informations importantes de <br>RH Conseil 71.</p>
         <div class="divider"></div>
       </header>
 
