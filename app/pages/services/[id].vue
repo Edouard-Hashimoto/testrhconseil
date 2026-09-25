@@ -272,9 +272,9 @@ const getYoutubeEmbedUrl = (url) => {
             <div class="sidebar-catalogue-icon">
               <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
             </div>
-            <h3>Livret des prestations et des formations</h3>
-            <p>Découvrez l'ensemble de nos formations dans notre livret.</p>
-            <NuxtLink to="/livret" class="btn-catalogue">Livret des prestations et des formations →</NuxtLink>
+            <h3>Livret des prestations</h3>
+            <p>Découvrez l'ensemble de nos prestations dans notre livret.</p>
+            <NuxtLink to="/livret" class="btn-catalogue">Livret des prestations →</NuxtLink>
           </div>
 
           <div class="contact-card">
